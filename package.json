@@ -1,0 +1,88 @@
+{
+  "name": "umean",
+  "version": "0.0.1",
+  "description": "TipTap WYSIWYG editor core — Web, Electron & TenTap",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js"
+    },
+    "./web": {
+      "types": "./dist/web/index.d.ts",
+      "import": "./dist/web/index.js"
+    },
+    "./tentap": {
+      "types": "./dist/tentap/index.d.ts",
+      "import": "./dist/tentap/index.js"
+    },
+    "./tentap/editor-html": {
+      "import": "./tentap/editor-web/build/editorHtml.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "tentap/editor-web"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:test": "rolldown -c",
+    "dev": "tsc --watch",
+    "test:dev": "concurrently -k \"tsc --watch\" \"rolldown -c --watch\" \"serve test -l 5173\"",
+    "test:open": "npm run build && npm run build:test && serve test -l 5173",
+    "editor:dev": "vite --config tentap/editor-web/vite.config.ts",
+    "editor:build": "vite --config tentap/editor-web/vite.config.ts build && node tentap/scripts/post-build.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "tiptap",
+    "wysiwyg",
+    "editor",
+    "json",
+    "markdown",
+    "tentap",
+    "react-native",
+    "electron"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@tiptap/core": "^3.27.3",
+    "@tiptap/markdown": "^3.27.3",
+    "@tiptap/pm": "^3.27.3",
+    "@tiptap/starter-kit": "^3.27.3"
+  },
+  "devDependencies": {
+    "@10play/tentap-editor": "^0.7.0",
+    "@tiptap/react": "^3.27.3",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.6.0",
+    "concurrently": "^9.2.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "rolldown": "^1.1.3",
+    "serve": "^14.2.4",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vite-plugin-singlefile": "^2.2.0"
+  },
+  "peerDependencies": {
+    "@tiptap/core": "^3.0.0",
+    "@tiptap/pm": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@10play/tentap-editor": {
+      "optional": true
+    },
+    "@tiptap/react": {
+      "optional": true
+    }
+  }
+}

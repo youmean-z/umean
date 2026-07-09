@@ -1,0 +1,6 @@
+node_modules/
+dist/
+test/dist/
+tentap/editor-web/build/
+*.log
+.DS_Store
