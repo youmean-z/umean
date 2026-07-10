@@ -2,8 +2,9 @@ import type { AnyExtension } from '@tiptap/core';
 import { Markdown } from '@tiptap/markdown';
 import StarterKit from '@tiptap/starter-kit';
 
-import type { DefaultExtensionsOptions } from '../types.js';
-import { MarkdownClipboard } from './markdownClipboard.js';
+import type { DefaultExtensionsOptions } from '../types';
+import { MarkdownClipboard } from './markdownClipboard';
+import { createRichExtensions } from './richExtensions';
 
 export function createDefaultExtensions(
   options: DefaultExtensionsOptions = {},
@@ -12,10 +13,15 @@ export function createDefaultExtensions(
 
   if (options.starterKit !== false) {
     extensions.push(
-      options.starterKit
-        ? StarterKit.configure(options.starterKit)
-        : StarterKit,
+      StarterKit.configure({
+        codeBlock: false,
+        ...options.starterKit,
+      }),
     );
+  }
+
+  if (options.rich !== false) {
+    extensions.push(...createRichExtensions(options.rich));
   }
 
   extensions.push(
@@ -25,3 +31,5 @@ export function createDefaultExtensions(
 
   return extensions;
 }
+
+export { createRichExtensions } from './richExtensions';

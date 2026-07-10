@@ -1,0 +1,39 @@
+/**
+ * 可选：富文本扩展参考主题样式。
+ * 用法：import 'umean/styles/rich.css'，并为编辑器容器添加 class="umean-editor"
+ *
+ * 可在此基础上覆盖变量或选择器以适配你的设计系统。
+ * 语法高亮需另行引入 highlight.js 主题。
+ */
+
+@import './rich-minimal.css';
+
+.umean-editor .ProseMirror img {
+  border-radius: 8px;
+}
+
+.umean-editor .ProseMirror table {
+  margin: 0.75rem 0;
+}
+
+.umean-editor .ProseMirror th,
+.umean-editor .ProseMirror td {
+  border: 1px solid #cbd5e1;
+  padding: 0.5rem 0.75rem;
+}
+
+.umean-editor .ProseMirror th {
+  background: #0f172a;
+  font-weight: 600;
+}
+
+.umean-editor .ProseMirror pre {
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.umean-editor .ProseMirror pre code {
+  color: inherit;
+}

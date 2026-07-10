@@ -1,22 +1,25 @@
-export { EditorCore } from './EditorCore.js';
-export { createEditor } from './createEditor.js';
-export type { EditorCoreOptions, EditorUpdatePayload } from './types.js';
+export { EditorCore } from './EditorCore';
+export { createEditor } from './createEditor';
+export type { EditorCoreOptions, EditorUpdatePayload } from './types';
 
 export {
   createDefaultExtensions,
+  createRichExtensions,
   createHeadlessEditor,
   jsonToHTML,
   jsonToMarkdown,
   markdownToJSON,
   emptyDoc,
+  demoDoc,
   MarkdownClipboard,
   Markdown,
   StarterKit,
-} from '../core/index.js';
+} from '../core/index';
 
 export type {
   DefaultExtensionsOptions,
+  RichExtensionsOptions,
   TransformOptions,
   Editor,
   JSONContent,
-} from '../core/index.js';
+} from '../core/index';

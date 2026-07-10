@@ -1,0 +1,52 @@
+/**
+ * 可选：富文本扩展的最小功能性样式（布局/结构，无主题色）。
+ * 用法：import 'umean/styles/rich-minimal.css'，并为编辑器容器添加 class="umean-editor"
+ *
+ * 语法高亮需另行引入 highlight.js 主题，例如：
+ * import 'highlight.js/styles/github-dark.min.css'
+ */
+
+.umean-editor .ProseMirror img {
+  height: auto;
+  max-width: 100%;
+}
+
+.umean-editor .ProseMirror ul[data-type='taskList'] {
+  list-style: none;
+  padding: 0;
+}
+
+.umean-editor .ProseMirror ul[data-type='taskList'] > li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.umean-editor .ProseMirror ul[data-type='taskList'] li > label {
+  flex: 0 0 auto;
+  user-select: none;
+}
+
+.umean-editor .ProseMirror ul[data-type='taskList'] li > div {
+  flex: 1 1 auto;
+}
+
+.umean-editor .ProseMirror table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.umean-editor .ProseMirror th,
+.umean-editor .ProseMirror td {
+  vertical-align: top;
+}
+
+.umean-editor .ProseMirror pre {
+  overflow-x: auto;
+}
+
+.umean-editor .ProseMirror pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.9em;
+}

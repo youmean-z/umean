@@ -1,2 +1,2 @@
-export * from './core/index.js';
-export * from './web/index.js';
+export * from './core/index';
+export * from './web/index';

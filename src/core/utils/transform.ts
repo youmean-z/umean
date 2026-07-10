@@ -1,7 +1,7 @@
 import { Editor, type JSONContent } from '@tiptap/core';
 
-import { createDefaultExtensions } from '../extensions/defaultExtensions.js';
-import { emptyDoc, type TransformOptions } from '../types.js';
+import { createDefaultExtensions } from '../extensions/defaultExtensions';
+import { emptyDoc, type TransformOptions } from '../types';
 
 function resolveExtensions(options: TransformOptions = {}) {
   return options.extensions ?? createDefaultExtensions(options.extensionOptions);

@@ -1,13 +1,20 @@
-export { createDefaultExtensions } from './extensions/defaultExtensions.js';
-export { MarkdownClipboard } from './extensions/markdownClipboard.js';
+export { createDefaultExtensions, createRichExtensions } from './extensions/defaultExtensions';
+export { MarkdownClipboard } from './extensions/markdownClipboard';
 export {
   createHeadlessEditor,
   jsonToHTML,
   jsonToMarkdown,
   markdownToJSON,
-} from './utils/transform.js';
+} from './utils/transform';
+export { getSharedLowlight } from './utils/lowlight';
 
-export { emptyDoc, type DefaultExtensionsOptions, type TransformOptions } from './types.js';
+export {
+  emptyDoc,
+  demoDoc,
+  type DefaultExtensionsOptions,
+  type RichExtensionsOptions,
+  type TransformOptions,
+} from './types';
 
 export { Markdown } from '@tiptap/markdown';
 export { default as StarterKit } from '@tiptap/starter-kit';

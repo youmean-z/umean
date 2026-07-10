@@ -1,47 +1,53 @@
-import type { DefaultExtensionsOptions } from '../core/types.js';
-import { createDefaultExtensions } from '../core/extensions/defaultExtensions.js';
+import type { AnyExtension } from '@tiptap/core';
+import { Markdown } from '@tiptap/markdown';
+
+import { MarkdownClipboard } from '../core/extensions/markdownClipboard';
+import type { DefaultExtensionsOptions } from '../core/types';
+import { createTenTapBridges } from './createTenTapBridges';
 
 export interface TenTapTiptapOptions {
-  extensions: ReturnType<typeof createDefaultExtensions>;
+  extensions: AnyExtension[];
 }
 
 /**
- * 为 TenTap `useTenTap({ tiptapOptions })` 生成与 Web 端一致的扩展配置。
- *
- * @example
- * ```tsx
- * import { useTenTap, TenTapStartKit } from '@10play/tentap-editor';
- * import { createTenTapTiptapOptions } from 'umean/tentap';
- *
- * const editor = useTenTap({
- *   bridges: TenTapStartKit,
- *   tiptapOptions: createTenTapTiptapOptions(),
- * });
- * ```
+ * TenTap WebView 侧扩展：Markdown + 剪贴板。
+ * Image / TaskList 由 TenTapStartKit Bridge 提供，Table / CodeBlock 由自定义 Bridge 提供。
  */
 export function createTenTapTiptapOptions(
-  extensionOptions: DefaultExtensionsOptions = {},
+  options: Pick<DefaultExtensionsOptions, 'markdown'> = {},
 ): TenTapTiptapOptions {
-  return {
-    extensions: createDefaultExtensions(extensionOptions),
-  };
+  const extensions: AnyExtension[] = [];
+
+  extensions.push(
+    options.markdown ? Markdown.configure(options.markdown) : Markdown,
+    MarkdownClipboard,
+  );
+
+  return { extensions };
 }
+
+export { createTenTapBridges } from './createTenTapBridges';
+export { TableBridge, TableEditorActionType } from './bridges/tableBridge';
+export { CodeBlockBridge, CodeBlockEditorActionType } from './bridges/codeBlockBridge';
 
 export {
   createDefaultExtensions,
+  createRichExtensions,
   createHeadlessEditor,
   jsonToHTML,
   jsonToMarkdown,
   markdownToJSON,
   emptyDoc,
+  demoDoc,
   MarkdownClipboard,
   Markdown,
   StarterKit,
-} from '../core/index.js';
+} from '../core/index';
 
 export type {
   DefaultExtensionsOptions,
+  RichExtensionsOptions,
   TransformOptions,
   Editor,
   JSONContent,
-} from '../core/index.js';
+} from '../core/index';

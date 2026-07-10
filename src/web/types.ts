@@ -1,6 +1,6 @@
 import type { Editor, EditorOptions, JSONContent } from '@tiptap/core';
 
-import type { DefaultExtensionsOptions } from '../core/types.js';
+import type { DefaultExtensionsOptions } from '../core/types';
 
 export interface EditorUpdatePayload {
   editor: Editor;

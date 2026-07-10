@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>umean 编辑器测试</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css"
+    />
+    <link rel="stylesheet" href="../styles/rich.css" />
     <style>
       * {
         box-sizing: border-box;
@@ -24,9 +29,30 @@
       }
 
       p.hint {
-        margin: 0 0 1.5rem;
+        margin: 0 0 1rem;
         color: #94a3b8;
         font-size: 0.9rem;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        max-width: 1200px;
+      }
+
+      .toolbar button {
+        border: 1px solid #334155;
+        background: #1e293b;
+        color: #e2e8f0;
+        border-radius: 8px;
+        padding: 0.45rem 0.8rem;
+        cursor: pointer;
+      }
+
+      .toolbar button:hover {
+        background: #334155;
       }
 
       .layout {
@@ -131,12 +157,19 @@
   </head>
   <body>
     <h1>umean 编辑器测试</h1>
-    <p class="hint">JSON 为主存储格式，右侧实时输出 JSON / HTML / Markdown。支持 Markdown 粘贴与复制。</p>
+    <p class="hint">JSON 为主存储格式。已启用 Image / TaskList / Table / CodeBlockLowlight。</p>
+
+    <div id="toolbar" class="toolbar" hidden>
+      <button type="button" data-action="toggle-task-list">任务列表</button>
+      <button type="button" data-action="insert-table">插入表格</button>
+      <button type="button" data-action="insert-image">插入图片</button>
+      <button type="button" data-action="toggle-code-block">代码块</button>
+    </div>
 
     <div class="layout">
       <div class="panel">
         <div class="panel-header">编辑器</div>
-        <div id="editor"></div>
+        <div id="editor" class="umean-editor"></div>
       </div>
       <div class="panel">
         <div class="panel-header">JSON</div>

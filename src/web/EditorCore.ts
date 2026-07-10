@@ -1,8 +1,8 @@
 import { Editor, type JSONContent } from '@tiptap/core';
 
-import { createDefaultExtensions } from '../core/extensions/defaultExtensions.js';
-import { emptyDoc } from '../core/types.js';
-import type { EditorCoreOptions } from './types.js';
+import { createDefaultExtensions } from '../core/extensions/defaultExtensions';
+import { emptyDoc } from '../core/types';
+import type { EditorCoreOptions } from './types';
 
 export class EditorCore {
   readonly editor: Editor;
