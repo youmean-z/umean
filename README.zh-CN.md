@@ -41,11 +41,10 @@ npm install @10play/tentap-editor @tiptap/core @tiptap/pm
 ```
 
 ```ts
-import { createEditor, demoDoc } from 'umean/web';
+import { createEditor } from 'umean/web';
 
 const core = createEditor({
   element: document.querySelector('#editor')!,
-  content: demoDoc,
   onUpdate: ({ json, html, markdown }) => {
     // json 为主存格式
     console.log(json);

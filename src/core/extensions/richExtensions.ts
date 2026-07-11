@@ -10,6 +10,8 @@ import TaskList from '@tiptap/extension-task-list';
 
 import type { RichExtensionsOptions } from '../types';
 import { getSharedLowlight } from '../utils/lowlight';
+import { TableAlignShortcut } from './tableAlignShortcut';
+import { TableShortcut } from './tableShortcut';
 
 export function createRichExtensions(
   options: RichExtensionsOptions = {},
@@ -43,6 +45,8 @@ export function createRichExtensions(
       TableRow,
       TableHeader,
       TableCell,
+      TableShortcut,
+      TableAlignShortcut,
     );
   }
 

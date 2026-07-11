@@ -14,11 +14,14 @@ const tableBridgeCSS = `
   table {
     border-collapse: collapse;
     width: 100%;
+    table-layout: fixed;
   }
 
   th,
   td {
     vertical-align: top;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 `;
 

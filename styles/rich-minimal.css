@@ -34,11 +34,14 @@
 .umean-editor .ProseMirror table {
   border-collapse: collapse;
   width: 100%;
+  table-layout: fixed;
 }
 
 .umean-editor .ProseMirror th,
 .umean-editor .ProseMirror td {
   vertical-align: top;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .umean-editor .ProseMirror pre {

@@ -38,7 +38,6 @@ export {
   jsonToMarkdown,
   markdownToJSON,
   emptyDoc,
-  demoDoc,
   MarkdownClipboard,
   Markdown,
   StarterKit,

@@ -1,4 +1,4 @@
-import { createEditor, demoDoc } from '../src/web/index.ts';
+import { createEditor } from '../src/web/index.ts';
 
 const editorEl = document.querySelector('#editor');
 const jsonOutputEl = document.querySelector('#json-output');
@@ -12,7 +12,6 @@ if (!editorEl) {
 
 const core = createEditor({
   element: editorEl as HTMLElement,
-  content: demoDoc,
   onUpdate: ({ json, html, markdown }) => {
     if (jsonOutputEl) {
       jsonOutputEl.textContent = JSON.stringify(json, null, 2);

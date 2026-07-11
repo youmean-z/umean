@@ -10,8 +10,9 @@ export {
   jsonToMarkdown,
   markdownToJSON,
   emptyDoc,
-  demoDoc,
   MarkdownClipboard,
+  TableAlignShortcut,
+  TableShortcut,
   Markdown,
   StarterKit,
 } from '../core/index';

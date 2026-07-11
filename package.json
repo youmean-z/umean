@@ -36,7 +36,8 @@
   "scripts": {
     "build": "rolldown -c rolldown.lib.config.ts && tsc --emitDeclarationOnly",
     "build:test": "rolldown -c rolldown.test.config.ts",
-    "dev": "concurrently -k \"rolldown -c rolldown.lib.config.ts --watch\" \"tsc --emitDeclarationOnly --watch\"",
+    "dev": "concurrently -k \"rolldown -c rolldown.lib.config.ts --watch\" \"tsc --emitDeclarationOnly --watch\" \"rolldown -c rolldown.test.config.ts --watch\" \"serve test -l 5173\"",
+    "dev:lib": "concurrently -k \"rolldown -c rolldown.lib.config.ts --watch\" \"tsc --emitDeclarationOnly --watch\"",
     "test:dev": "concurrently -k \"rolldown -c rolldown.lib.config.ts --watch\" \"tsc --emitDeclarationOnly --watch\" \"rolldown -c rolldown.test.config.ts --watch\" \"serve test -l 5173\"",
     "test:open": "npm run build && npm run build:test && serve test -l 5173",
     "editor:dev": "vite --config tentap/editor-web/vite.config.ts",
@@ -78,6 +79,7 @@
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
     "concurrently": "^9.2.0",
+    "happy-dom": "^15.11.7",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "rolldown": "^1.1.3",
@@ -87,9 +89,9 @@
     "vite-plugin-singlefile": "^2.2.0"
   },
   "peerDependencies": {
+    "@10play/tentap-editor": "^1.0.0",
     "@tiptap/core": "^3.0.0",
-    "@tiptap/pm": "^3.0.0",
-    "@10play/tentap-editor": "^1.0.0"
+    "@tiptap/pm": "^3.0.0"
   },
   "peerDependenciesMeta": {
     "@10play/tentap-editor": {
