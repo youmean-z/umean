@@ -10,6 +10,7 @@ export {
   jsonToMarkdown,
   markdownToJSON,
   emptyDoc,
+  HeadingPolicy,
   MarkdownClipboard,
   TableAlignShortcut,
   TableShortcut,
@@ -19,6 +20,8 @@ export {
 
 export type {
   DefaultExtensionsOptions,
+  HeadingPolicyMode,
+  HeadingPolicyOptions,
   RichExtensionsOptions,
   TransformOptions,
   Editor,

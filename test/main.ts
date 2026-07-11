@@ -1,17 +1,36 @@
-import { createEditor } from '../src/web/index.ts';
+import { createEditor, type HeadingPolicyMode } from '../src/web/index.ts';
 
 const editorEl = document.querySelector('#editor');
 const jsonOutputEl = document.querySelector('#json-output');
 const htmlOutputEl = document.querySelector('#html-output');
 const markdownOutputEl = document.querySelector('#markdown-output');
 const toolbarEl = document.querySelector('#toolbar');
+const modeHintEl = document.querySelector('#mode-hint');
+
+function resolveHeadingPolicyMode(): HeadingPolicyMode {
+  const mode = new URLSearchParams(window.location.search).get('mode');
+  if (mode === 'document' || mode === 'chunk' || mode === 'free') {
+    return mode;
+  }
+
+  return 'free';
+}
+
+const headingPolicyMode = resolveHeadingPolicyMode();
 
 if (!editorEl) {
   throw new Error('Missing #editor element');
 }
 
+if (modeHintEl) {
+  modeHintEl.textContent = `当前标题策略：${headingPolicyMode}（?mode=free|document|chunk）`;
+}
+
 const core = createEditor({
   element: editorEl as HTMLElement,
+  extensionOptions: {
+    headingPolicy: { mode: headingPolicyMode },
+  },
   onUpdate: ({ json, html, markdown }) => {
     if (jsonOutputEl) {
       jsonOutputEl.textContent = JSON.stringify(json, null, 2);

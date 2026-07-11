@@ -1,4 +1,5 @@
 export { createDefaultExtensions, createRichExtensions } from './extensions/defaultExtensions';
+export { HeadingPolicy } from './extensions/headingPolicy';
 export { MarkdownClipboard } from './extensions/markdownClipboard';
 export { TableAlignShortcut } from './extensions/tableAlignShortcut';
 export { TableShortcut } from './extensions/tableShortcut';
@@ -13,6 +14,8 @@ export { getSharedLowlight } from './utils/lowlight';
 export {
   emptyDoc,
   type DefaultExtensionsOptions,
+  type HeadingPolicyMode,
+  type HeadingPolicyOptions,
   type RichExtensionsOptions,
   type TransformOptions,
 } from './types';
