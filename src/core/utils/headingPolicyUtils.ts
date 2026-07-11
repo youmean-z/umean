@@ -5,7 +5,6 @@ import type { HeadingPolicyMode } from '../types';
 
 export interface ApplyHeadingPolicyOptions {
   mode: HeadingPolicyMode;
-  placeholderTitle: string;
 }
 
 function demoteHeadingToLevel2(
@@ -16,11 +15,8 @@ function demoteHeadingToLevel2(
   return tr.setNodeMarkup(pos, undefined, { ...node.attrs, level: 2 });
 }
 
-function createTitleHeading(schema: Schema, text: string): ProseMirrorNode {
-  return schema.nodes.heading.create(
-    { level: 1 },
-    text ? schema.text(text) : undefined,
-  );
+function createTitleHeading(schema: Schema): ProseMirrorNode {
+  return schema.nodes.heading.create({ level: 1 });
 }
 
 function createEmptyParagraph(schema: Schema): ProseMirrorNode {
@@ -33,7 +29,7 @@ export function applyHeadingPolicy(
   schema: Schema,
   options: ApplyHeadingPolicyOptions,
 ): { tr: Transaction; changed: boolean } {
-  const { mode, placeholderTitle } = options;
+  const { mode } = options;
 
   if (mode === 'free') {
     return { tr, changed: false };
@@ -66,7 +62,7 @@ export function applyHeadingPolicy(
   const first = doc.firstChild;
 
   if (!first) {
-    const title = createTitleHeading(schema, placeholderTitle);
+    const title = createTitleHeading(schema);
     const paragraph = createEmptyParagraph(schema);
     nextTr = nextTr.insert(0, [title, paragraph]);
     return { tr: nextTr, changed: true };
@@ -81,7 +77,7 @@ export function applyHeadingPolicy(
     nextTr = nextTr.setNodeMarkup(0, schema.nodes.heading, { level: 1 });
     changed = true;
   } else {
-    const title = createTitleHeading(schema, placeholderTitle);
+    const title = createTitleHeading(schema);
     nextTr = nextTr.insert(0, title);
     changed = true;
   }
@@ -106,19 +102,23 @@ export function applyHeadingPolicy(
   return { tr: nextTr, changed };
 }
 
-export function createDocumentDoc(
-  placeholderTitle: string,
-): { type: 'doc'; content: Array<Record<string, unknown>> } {
+export function createDocumentDoc(): {
+  type: 'doc';
+  content: Array<Record<string, unknown>>;
+} {
   return {
     type: 'doc',
-    content: [
-      {
-        type: 'heading',
-        attrs: { level: 1 },
-        content: [{ type: 'text', text: placeholderTitle }],
-      },
-      { type: 'paragraph' },
-    ],
+    content: [{ type: 'heading', attrs: { level: 1 } }, { type: 'paragraph' }],
+  };
+}
+
+export function createEmptyParagraphDoc(): {
+  type: 'doc';
+  content: Array<Record<string, unknown>>;
+} {
+  return {
+    type: 'doc',
+    content: [{ type: 'paragraph' }],
   };
 }
 

@@ -1,38 +1,40 @@
-import type { AnyExtension } from '@tiptap/core';
-import { Markdown } from '@tiptap/markdown';
+import type { EditorOptions } from '@tiptap/core';
 
-import { MarkdownClipboard } from '../core/extensions/markdownClipboard';
+import { createTenTapSupplementalExtensions } from '../core/extensions/defaultExtensions';
 import type { DefaultExtensionsOptions } from '../core/types';
-import { createTenTapBridges } from './createTenTapBridges';
 
 export interface TenTapTiptapOptions {
-  extensions: AnyExtension[];
+  extensions: EditorOptions['extensions'];
+  editorProps?: EditorOptions['editorProps'];
+  content?: EditorOptions['content'];
+  contentType?: EditorOptions['contentType'];
 }
 
 /**
- * TenTap WebView 侧扩展：Markdown + 剪贴板。
- * Image / TaskList 由 TenTapStartKit Bridge 提供，Table / CodeBlock 由自定义 Bridge 提供。
+ * TenTap WebView 侧 TipTap 配置。
+ * 基础格式与富媒体由 Bridge 提供；此处追加与 Web 对齐的补充扩展。
  */
 export function createTenTapTiptapOptions(
-  options: Pick<DefaultExtensionsOptions, 'markdown'> = {},
+  options: DefaultExtensionsOptions = {},
 ): TenTapTiptapOptions {
-  const extensions: AnyExtension[] = [];
-
-  extensions.push(
-    options.markdown ? Markdown.configure(options.markdown) : Markdown,
-    MarkdownClipboard,
-  );
-
-  return { extensions };
+  return {
+    extensions: createTenTapSupplementalExtensions(options),
+    editorProps: {
+      attributes: {
+        spellcheck: 'false',
+      },
+    },
+  };
 }
 
-export { createTenTapBridges } from './createTenTapBridges';
+export { createTenTapBridges, type TenTapBridgesOptions } from './createTenTapBridges';
 export { TableBridge, TableEditorActionType } from './bridges/tableBridge';
 export { CodeBlockBridge, CodeBlockEditorActionType } from './bridges/codeBlockBridge';
 
 export {
   createDefaultExtensions,
   createRichExtensions,
+  createTenTapSupplementalExtensions,
   createHeadlessEditor,
   jsonToHTML,
   jsonToMarkdown,
@@ -45,6 +47,8 @@ export {
 
 export type {
   DefaultExtensionsOptions,
+  HeadingPolicyMode,
+  HeadingPolicyOptions,
   RichExtensionsOptions,
   TransformOptions,
   Editor,

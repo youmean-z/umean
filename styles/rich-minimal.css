@@ -53,3 +53,17 @@
   padding: 0;
   font-size: 0.9em;
 }
+
+.umean-editor .ProseMirror p.is-empty::before,
+.umean-editor .ProseMirror h1.is-empty::before,
+.umean-editor .ProseMirror h2.is-empty::before,
+.umean-editor .ProseMirror h3.is-empty::before,
+.umean-editor .ProseMirror h4.is-empty::before,
+.umean-editor .ProseMirror h5.is-empty::before,
+.umean-editor .ProseMirror h6.is-empty::before {
+  color: #94a3b8;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}

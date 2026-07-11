@@ -10,10 +10,15 @@ import type { StarterKitOptions } from '@tiptap/starter-kit';
 
 export type HeadingPolicyMode = 'free' | 'document' | 'chunk';
 
+export const DEFAULT_PLACEHOLDER_TITLE = '请输入标题';
+export const DEFAULT_PLACEHOLDER_CONTENT = '请输入内容';
+
 export interface HeadingPolicyOptions {
   mode?: HeadingPolicyMode;
-  /** document 模式：空文档或首块非 h1 时的默认标题文案 */
+  /** 空标题块的 placeholder 文案 */
   placeholderTitle?: string;
+  /** 空正文段落的 placeholder 文案 */
+  placeholderContent?: string;
 }
 
 export interface RichExtensionsOptions {

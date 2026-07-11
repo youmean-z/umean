@@ -24,35 +24,8 @@
       }
 
       h1 {
-        margin: 0 0 0.5rem;
-        font-size: 1.5rem;
-      }
-
-      p.hint {
         margin: 0 0 1rem;
-        color: #94a3b8;
-        font-size: 0.9rem;
-      }
-
-      .toolbar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-        max-width: 1200px;
-      }
-
-      .toolbar button {
-        border: 1px solid #334155;
-        background: #1e293b;
-        color: #e2e8f0;
-        border-radius: 8px;
-        padding: 0.45rem 0.8rem;
-        cursor: pointer;
-      }
-
-      .toolbar button:hover {
-        background: #334155;
+        font-size: 1.5rem;
       }
 
       .layout {
@@ -106,7 +79,6 @@
       .editor-content h2,
       .editor-content h3 {
         line-height: 1.3;
-        margin: 1rem 0 0.5rem;
       }
 
       .editor-content p {
@@ -157,17 +129,8 @@
   </head>
   <body>
     <h1>umean 编辑器测试</h1>
-    <p class="hint" id="mode-hint"></p>
-    <p class="hint">表格：/t3x4 + 空格 = 3列4行；后缀 c/l/r 全表居中/左/右（如 /t3x4c）。单元格内 /ac /al /ar + 空格设置当前格对齐。代码块内无效。</p>
 
-    <div id="toolbar" class="toolbar" hidden>
-      <button type="button" data-action="toggle-task-list">任务列表</button>
-      <button type="button" data-action="insert-table">插入表格</button>
-      <button type="button" data-action="insert-image">插入图片</button>
-      <button type="button" data-action="toggle-code-block">代码块</button>
-    </div>
-
-    <div class="layout">
+    <div class="layout">      
       <div class="panel">
         <div class="panel-header">编辑器</div>
         <div id="editor" class="umean-editor"></div>

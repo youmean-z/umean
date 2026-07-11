@@ -2,7 +2,10 @@ import { Extension } from '@tiptap/core';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 
 import type { HeadingPolicyOptions } from '../types';
-import { applyHeadingPolicy } from '../utils/headingPolicyUtils';
+import {
+  applyHeadingPolicy,
+  createDocumentDoc,
+} from '../utils/headingPolicyUtils';
 
 const headingPolicyPluginKey = new PluginKey('headingPolicy');
 
@@ -12,13 +15,11 @@ export const HeadingPolicy = Extension.create<HeadingPolicyOptions>({
   addOptions() {
     return {
       mode: 'free',
-      placeholderTitle: '未命名',
     };
   },
 
   onCreate() {
     const mode = this.options.mode ?? 'free';
-    const placeholderTitle = this.options.placeholderTitle ?? '未命名';
 
     if (mode !== 'document') {
       return;
@@ -28,17 +29,7 @@ export const HeadingPolicy = Extension.create<HeadingPolicyOptions>({
     const json = editor.getJSON();
 
     if (!json.content?.length) {
-      editor.commands.setContent({
-        type: 'doc',
-        content: [
-          {
-            type: 'heading',
-            attrs: { level: 1 },
-            content: [{ type: 'text', text: placeholderTitle }],
-          },
-          { type: 'paragraph' },
-        ],
-      });
+      editor.commands.setContent(createDocumentDoc());
       return;
     }
 
@@ -47,7 +38,7 @@ export const HeadingPolicy = Extension.create<HeadingPolicyOptions>({
         state.tr,
         state.doc,
         state.schema,
-        { mode, placeholderTitle },
+        { mode },
       );
 
       if (!changed || !dispatch) {
@@ -61,7 +52,6 @@ export const HeadingPolicy = Extension.create<HeadingPolicyOptions>({
 
   addProseMirrorPlugins() {
     const mode = this.options.mode ?? 'free';
-    const placeholderTitle = this.options.placeholderTitle ?? '未命名';
 
     if (mode === 'free') {
       return [];
@@ -80,7 +70,7 @@ export const HeadingPolicy = Extension.create<HeadingPolicyOptions>({
             newState.tr,
             newState.doc,
             newState.schema,
-            { mode, placeholderTitle },
+            { mode },
           );
 
           return changed ? tr : null;

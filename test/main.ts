@@ -4,8 +4,6 @@ const editorEl = document.querySelector('#editor');
 const jsonOutputEl = document.querySelector('#json-output');
 const htmlOutputEl = document.querySelector('#html-output');
 const markdownOutputEl = document.querySelector('#markdown-output');
-const toolbarEl = document.querySelector('#toolbar');
-const modeHintEl = document.querySelector('#mode-hint');
 
 function resolveHeadingPolicyMode(): HeadingPolicyMode {
   const mode = new URLSearchParams(window.location.search).get('mode');
@@ -16,20 +14,14 @@ function resolveHeadingPolicyMode(): HeadingPolicyMode {
   return 'free';
 }
 
-const headingPolicyMode = resolveHeadingPolicyMode();
-
 if (!editorEl) {
   throw new Error('Missing #editor element');
-}
-
-if (modeHintEl) {
-  modeHintEl.textContent = `当前标题策略：${headingPolicyMode}（?mode=free|document|chunk）`;
 }
 
 const core = createEditor({
   element: editorEl as HTMLElement,
   extensionOptions: {
-    headingPolicy: { mode: headingPolicyMode },
+    headingPolicy: { mode: resolveHeadingPolicyMode() },
   },
   onUpdate: ({ json, html, markdown }) => {
     if (jsonOutputEl) {
@@ -49,34 +41,6 @@ const core = createEditor({
   },
 });
 
-function bindButton(selector: string, handler: () => void) {
-  const button = document.querySelector(selector);
-  button?.addEventListener('click', handler);
-}
-
-bindButton('[data-action="toggle-task-list"]', () => {
-  core.editor.chain().focus().toggleTaskList().run();
-});
-
-bindButton('[data-action="insert-table"]', () => {
-  core.editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
-});
-
-bindButton('[data-action="insert-image"]', () => {
-  core.editor
-    .chain()
-    .focus()
-    .setImage({
-      src: 'https://picsum.photos/seed/umean/640/240',
-      alt: 'Demo image',
-    })
-    .run();
-});
-
-bindButton('[data-action="toggle-code-block"]', () => {
-  core.editor.chain().focus().toggleCodeBlock({ language: 'javascript' }).run();
-});
-
 if (jsonOutputEl) {
   jsonOutputEl.textContent = JSON.stringify(core.getJSON(), null, 2);
 }
@@ -85,8 +49,4 @@ if (htmlOutputEl) {
 }
 if (markdownOutputEl) {
   markdownOutputEl.textContent = core.getMarkdown();
-}
-
-if (toolbarEl) {
-  toolbarEl.removeAttribute('hidden');
 }

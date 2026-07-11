@@ -1,4 +1,5 @@
-export { createDefaultExtensions, createRichExtensions } from './extensions/defaultExtensions';
+export { createDefaultExtensions, createRichExtensions, createTenTapSupplementalExtensions } from './extensions/defaultExtensions';
+export { createEditorPlaceholder } from './extensions/editorPlaceholder';
 export { HeadingPolicy } from './extensions/headingPolicy';
 export { MarkdownClipboard } from './extensions/markdownClipboard';
 export { TableAlignShortcut } from './extensions/tableAlignShortcut';
@@ -12,6 +13,8 @@ export {
 export { getSharedLowlight } from './utils/lowlight';
 
 export {
+  DEFAULT_PLACEHOLDER_CONTENT,
+  DEFAULT_PLACEHOLDER_TITLE,
   emptyDoc,
   type DefaultExtensionsOptions,
   type HeadingPolicyMode,
