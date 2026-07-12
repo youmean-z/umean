@@ -10,10 +10,9 @@ const DEMO_MARKDOWN = `# 公式与流程图测试
 
 行内公式：$E=mc^2$ 以及 $\\alpha + \\beta = \\gamma$
 
-块级公式：
-
 $$
-\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}
+\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2} \\\\
+E=mc^2
 $$
 
 流程图（工具栏「图表 / 代码」切换）：

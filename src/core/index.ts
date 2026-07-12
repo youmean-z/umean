@@ -1,5 +1,10 @@
 export { createDefaultExtensions, createRichExtensions, createTenTapSupplementalExtensions } from './extensions/defaultExtensions';
 export { createEditorPlaceholder, type EditorPlaceholderOptions } from './extensions/editorPlaceholder';
+export {
+  BlockMathNodeViewExtension,
+  BlockMathWithNodeView,
+  type BlockMathNodeViewOptions,
+} from './extensions/blockMathNodeView';
 export { HeadingPolicy } from './extensions/headingPolicy';
 export { InlineMathUnwrap, inlineMathToEditableText } from './extensions/inlineMathUnwrap';
 export { MarkdownClipboard } from './extensions/markdownClipboard';

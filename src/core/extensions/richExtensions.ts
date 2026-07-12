@@ -1,7 +1,7 @@
 import type { AnyExtension } from '@tiptap/core';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import Image from '@tiptap/extension-image';
-import { Mathematics } from '@tiptap/extension-mathematics';
+import { InlineMath } from '@tiptap/extension-mathematics';
 import { Table } from '@tiptap/extension-table';
 import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
@@ -12,6 +12,7 @@ import TaskList from '@tiptap/extension-task-list';
 import type { RichExtensionsOptions } from '../types';
 import { getSharedLowlight } from '../utils/lowlight';
 import { MermaidCodeBlock } from './mermaidCodeBlock';
+import { BlockMathWithNodeView } from './blockMathNodeView';
 import { InlineMathUnwrap } from './inlineMathUnwrap';
 import { TableAlignShortcut } from './tableAlignShortcut';
 import { TableShortcut } from './tableShortcut';
@@ -65,11 +66,17 @@ export function createRichExtensions(
   }
 
   if (options.math !== false) {
+    const katexOptions = {
+      throwOnError: false,
+      ...options.math?.katexOptions,
+    };
+
     extensions.push(
-      Mathematics.configure({
+      InlineMath.configure({ katexOptions }),
+      BlockMathWithNodeView.configure({
         katexOptions: {
-          throwOnError: false,
-          ...options.math?.katexOptions,
+          displayMode: true,
+          ...katexOptions,
         },
       }),
       InlineMathUnwrap,

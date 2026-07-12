@@ -2,10 +2,11 @@ import { describe, it, expect } from 'vitest';
 import { createRichExtensions } from './richExtensions';
 
 describe('createRichExtensions', () => {
-  it('includes Mathematics by default', () => {
+  it('includes math extensions by default', () => {
     const exts = createRichExtensions();
     const names = exts.map((e: any) => e.name);
-    expect(names).toContain('Mathematics');
+    expect(names).toContain('inlineMath');
+    expect(names).toContain('blockMath');
     expect(names).toContain('inlineMathUnwrap');
   });
 
@@ -15,10 +16,11 @@ describe('createRichExtensions', () => {
     expect(names).toContain('mermaidCodeBlock');
   });
 
-  it('excludes Mathematics when math: false', () => {
+  it('excludes math when math: false', () => {
     const exts = createRichExtensions({ math: false });
     const names = exts.map((e: any) => e.name);
-    expect(names).not.toContain('Mathematics');
+    expect(names).not.toContain('inlineMath');
+    expect(names).not.toContain('blockMath');
     expect(names).not.toContain('inlineMathUnwrap');
   });
 
@@ -34,12 +36,13 @@ describe('createRichExtensions', () => {
     expect(names).not.toContain('mermaidCodeBlock');
   });
 
-  it('configures Mathematics with katexOptions', () => {
+  it('configures block math with katexOptions', () => {
     const exts = createRichExtensions({
       math: { katexOptions: { throwOnError: true } },
     });
-    const math = exts.find((e: any) => e.name === 'Mathematics') as any;
-    expect(math).toBeDefined();
+    const blockMath = exts.find((e: any) => e.name === 'blockMath') as any;
+    expect(blockMath).toBeDefined();
+    expect(blockMath.options?.katexOptions?.throwOnError).toBe(true);
   });
 
   it('configures MermaidCodeBlock with enabled', () => {
