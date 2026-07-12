@@ -16,7 +16,7 @@ $$
 \\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}
 $$
 
-流程图（点击图进入编辑，失焦后显示预览）：
+流程图（工具栏「图表 / 代码」切换）：
 
 \`\`\`mermaid
 graph TD
@@ -25,6 +25,7 @@ graph TD
     B -->|否| D[重试]
     D --> B
 \`\`\`
+
 `;
 
 function resolveHeadingPolicyMode(): HeadingPolicyMode {

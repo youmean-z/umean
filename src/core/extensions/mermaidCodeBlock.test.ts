@@ -1,17 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { RenderResult } from 'mermaid';
+
+const { mockMermaidRenderResult } = vi.hoisted(() => ({
+  mockMermaidRenderResult: {
+    svg: '<svg class="mermaid-svg">test</svg>',
+    diagramType: 'flowchart',
+  } satisfies RenderResult,
+}));
 
 // Mock mermaid for NodeView tests
 vi.mock('mermaid', () => ({
   default: {
     initialize: vi.fn(),
-    render: vi.fn().mockResolvedValue({
-      svg: '<svg class="mermaid-svg">test</svg>',
-    }),
+    render: vi.fn().mockResolvedValue(mockMermaidRenderResult),
   },
 }));
-
 import { Editor, type JSONContent } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
+import mermaid from 'mermaid';
 import { MermaidCodeBlock, resetMermaidInitializedForTests } from './mermaidCodeBlock';
 
 function textNodeIncludes(node: JSONContent, fragment: string): boolean {
@@ -28,6 +34,7 @@ function contentIncludesText(content: JSONContent[] | undefined, fragment: strin
 
 beforeEach(() => {
   resetMermaidInitializedForTests();
+  vi.mocked(mermaid.render).mockResolvedValue(mockMermaidRenderResult);
 });
 
 function flushMicrotasks(): Promise<void> {
@@ -113,7 +120,7 @@ describe('Mermaid NodeView in editor', () => {
     div.remove();
   });
 
-  it('shows preview by default when not focused', async () => {
+  it('shows preview by default when block has content', async () => {
     const div = document.createElement('div');
     document.body.appendChild(div);
 
@@ -135,18 +142,53 @@ describe('Mermaid NodeView in editor', () => {
     await flushMicrotasks();
     await flushMicrotasks();
 
-    const previewDOM = div.querySelector('.mermaid-preview') as HTMLElement | null;
-    const pre = div.querySelector('.mermaid-nodeview pre') as HTMLElement | null;
+    const nodeview = div.querySelector('.mermaid-nodeview') as HTMLElement | null;
+    const previewButton = div.querySelector(
+      '.mermaid-toolbar__button[aria-pressed="true"]',
+    ) as HTMLButtonElement | null;
 
-    expect(previewDOM).not.toBeNull();
-    expect(previewDOM?.style.display).not.toBe('none');
-    expect(pre?.style.display).toBe('none');
+    expect(nodeview).not.toBeNull();
+    expect(nodeview?.classList.contains('mermaid-nodeview--preview')).toBe(true);
+    expect(previewButton?.textContent).toBe('图表');
 
     editor.destroy();
     div.remove();
   });
 
-  it('switches to edit mode when preview is clicked', async () => {
+  it('defaults to code mode for empty mermaid block', async () => {
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+
+    const editor = new Editor({
+      element: div,
+      extensions: [StarterKit, MermaidCodeBlock],
+      content: {
+        type: 'doc',
+        content: [
+          {
+            type: 'codeBlock',
+            attrs: { language: 'mermaid' },
+          },
+        ],
+      },
+    });
+
+    await flushMicrotasks();
+    await flushMicrotasks();
+
+    const nodeview = div.querySelector('.mermaid-nodeview') as HTMLElement | null;
+    const codeButton = div.querySelector(
+      '.mermaid-toolbar__button[aria-pressed="true"]',
+    ) as HTMLButtonElement | null;
+
+    expect(nodeview?.classList.contains('mermaid-nodeview--code')).toBe(true);
+    expect(codeButton?.textContent).toBe('代码');
+
+    editor.destroy();
+    div.remove();
+  });
+
+  it('switches to code mode when code button is clicked', async () => {
     const div = document.createElement('div');
     document.body.appendChild(div);
 
@@ -168,13 +210,171 @@ describe('Mermaid NodeView in editor', () => {
     await flushMicrotasks();
     await flushMicrotasks();
 
-    const previewDOM = div.querySelector('.mermaid-preview') as HTMLElement;
-    const pre = div.querySelector('.mermaid-nodeview pre') as HTMLElement;
+    const nodeview = div.querySelector('.mermaid-nodeview') as HTMLElement;
+    const codeButton = Array.from(
+      div.querySelectorAll('.mermaid-toolbar__button'),
+    ).find((button) => button.textContent === '代码') as HTMLButtonElement;
 
-    previewDOM.click();
+    codeButton.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
 
-    expect(pre.style.display).not.toBe('none');
-    expect(previewDOM.style.display).toBe('none');
+    expect(nodeview.classList.contains('mermaid-nodeview--code')).toBe(true);
+    expect(codeButton.getAttribute('aria-pressed')).toBe('true');
+
+    editor.destroy();
+    div.remove();
+  });
+
+  it('preserves multiline content when editing in code mode', async () => {
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+
+    const editor = new Editor({
+      element: div,
+      extensions: [StarterKit, MermaidCodeBlock],
+      content: {
+        type: 'doc',
+        content: [
+          {
+            type: 'codeBlock',
+            attrs: { language: 'mermaid' },
+            content: [{ type: 'text', text: 'graph TD' }],
+          },
+        ],
+      },
+    });
+
+    await flushMicrotasks();
+    await flushMicrotasks();
+
+    const codeButton = Array.from(
+      div.querySelectorAll('.mermaid-toolbar__button'),
+    ).find((button) => button.textContent === '代码') as HTMLButtonElement;
+    codeButton.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+
+    const pos = editor.state.selection.from;
+    editor.view.dispatch(editor.state.tr.insertText('\n  A --> B', pos));
+
+    const json = editor.getJSON();
+    const codeBlock = json.content?.find((n) => n.type === 'codeBlock');
+    expect(codeBlock?.content?.[0]).toMatchObject({
+      type: 'text',
+      text: 'graph TD\n  A --> B',
+    });
+    expect(json.content?.filter((n) => n.type === 'codeBlock').length).toBe(1);
+
+    editor.destroy();
+    div.remove();
+  });
+
+  it('shows inline parse error and suppresses global mermaid error DOM', async () => {
+    vi.mocked(mermaid.render).mockRejectedValueOnce(new Error('parse failed'));
+
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+
+    const editor = new Editor({
+      element: div,
+      extensions: [StarterKit, MermaidCodeBlock],
+      content: {
+        type: 'doc',
+        content: [
+          {
+            type: 'codeBlock',
+            attrs: { language: 'mermaid' },
+            content: [{ type: 'text', text: 'grahp LR\n  A --> B' }],
+          },
+        ],
+      },
+    });
+
+    await flushMicrotasks();
+    await flushMicrotasks();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const preview = div.querySelector('.mermaid-preview') as HTMLElement;
+    expect(preview.textContent).toContain('(Mermaid 解析错误)');
+    expect(document.body.textContent).not.toContain('Syntax error in text');
+
+    expect(vi.mocked(mermaid.initialize)).toHaveBeenCalledWith(
+      expect.objectContaining({ suppressErrorRendering: true }),
+    );
+
+    editor.destroy();
+    div.remove();
+  });
+
+  it('switches back to preview when preview button is clicked', async () => {
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+
+    const editor = new Editor({
+      element: div,
+      extensions: [StarterKit, MermaidCodeBlock],
+      content: {
+        type: 'doc',
+        content: [
+          {
+            type: 'codeBlock',
+            attrs: { language: 'mermaid' },
+            content: [{ type: 'text', text: 'graph TD\n  A --> B' }],
+          },
+        ],
+      },
+    });
+
+    await flushMicrotasks();
+    await flushMicrotasks();
+
+    const nodeview = div.querySelector('.mermaid-nodeview') as HTMLElement;
+    const buttons = Array.from(div.querySelectorAll('.mermaid-toolbar__button'));
+    const codeButton = buttons.find((button) => button.textContent === '代码') as HTMLButtonElement;
+    const previewButton = buttons.find((button) => button.textContent === '图表') as HTMLButtonElement;
+
+    codeButton.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    previewButton.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+
+    expect(nodeview.classList.contains('mermaid-nodeview--preview')).toBe(true);
+    expect(previewButton.getAttribute('aria-pressed')).toBe('true');
+
+    editor.destroy();
+    div.remove();
+  });
+
+  it('does not auto-switch mode when selection moves away', async () => {
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+
+    const editor = new Editor({
+      element: div,
+      extensions: [StarterKit, MermaidCodeBlock],
+      content: {
+        type: 'doc',
+        content: [
+          {
+            type: 'codeBlock',
+            attrs: { language: 'mermaid' },
+            content: [{ type: 'text', text: 'graph TD\n  A --> B' }],
+          },
+          {
+            type: 'paragraph',
+            content: [{ type: 'text', text: 'after mermaid' }],
+          },
+        ],
+      },
+    });
+
+    await flushMicrotasks();
+    await flushMicrotasks();
+
+    const nodeview = div.querySelector('.mermaid-nodeview') as HTMLElement;
+    const codeButton = Array.from(
+      div.querySelectorAll('.mermaid-toolbar__button'),
+    ).find((button) => button.textContent === '代码') as HTMLButtonElement;
+
+    codeButton.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    editor.commands.focus('end');
+
+    expect(nodeview.classList.contains('mermaid-nodeview--code')).toBe(true);
 
     editor.destroy();
     div.remove();

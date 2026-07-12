@@ -54,19 +54,85 @@
   font-size: 0.9em;
 }
 
-/* Mermaid 流程图 NodeView */
+/* Mermaid 流程图 NodeView（变量可在 .umean-editor 上覆盖以适配主题） */
 .umean-editor .ProseMirror .mermaid-nodeview {
+  --umean-mermaid-border: #334155;
+  --umean-mermaid-toolbar-bg: #172033;
+  --umean-mermaid-toolbar-border: #334155;
+  --umean-mermaid-button-color: #94a3b8;
+  --umean-mermaid-button-hover-bg: #334155;
+  --umean-mermaid-button-hover-color: #e2e8f0;
+  --umean-mermaid-button-active-bg: #1e293b;
+  --umean-mermaid-button-active-border: #475569;
+  --umean-mermaid-button-active-color: #f1f5f9;
+  --umean-mermaid-preview-bg: #0f172a;
+
   margin: 0.75rem 0;
+  border: 1px solid var(--umean-mermaid-border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: var(--umean-mermaid-preview-bg);
+}
+
+.umean-editor .ProseMirror .mermaid-toolbar {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.375rem 0.5rem;
+  border-bottom: 1px solid var(--umean-mermaid-toolbar-border);
+  background: var(--umean-mermaid-toolbar-bg);
+}
+
+.umean-editor .ProseMirror .mermaid-toolbar__button {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: var(--umean-mermaid-button-color);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  padding: 0.125rem 0.625rem;
+}
+
+.umean-editor .ProseMirror .mermaid-toolbar__button:hover {
+  background: var(--umean-mermaid-button-hover-bg);
+  color: var(--umean-mermaid-button-hover-color);
+}
+
+.umean-editor .ProseMirror .mermaid-toolbar__button[aria-pressed='true'] {
+  background: var(--umean-mermaid-button-active-bg);
+  border-color: var(--umean-mermaid-button-active-border);
+  color: var(--umean-mermaid-button-active-color);
+  font-weight: 600;
+}
+
+.umean-editor .ProseMirror .mermaid-nodeview--preview .mermaid-source {
+  display: none;
+}
+
+.umean-editor .ProseMirror .mermaid-nodeview--code .mermaid-preview {
+  display: none;
+}
+
+.umean-editor .ProseMirror .mermaid-source {
+  margin: 0;
+  background: transparent;
 }
 
 .umean-editor .ProseMirror .mermaid-preview {
   overflow-x: auto;
-  cursor: pointer;
+  padding: 0.75rem;
+  background: var(--umean-mermaid-preview-bg);
+  cursor: default;
+  user-select: none;
+  pointer-events: none;
 }
 
 .umean-editor .ProseMirror .mermaid-preview svg {
   max-width: 100%;
   display: block;
+  margin: 0 auto;
 }
 
 /* KaTeX 数学公式 */

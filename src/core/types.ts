@@ -30,6 +30,8 @@ export interface MathOptions {
 export interface MermaidOptions {
   /** 是否启用 Mermaid 实时渲染，默认 true */
   enabled?: boolean;
+  /** Mermaid 图表主题，默认 dark */
+  theme?: 'default' | 'base' | 'dark' | 'forest' | 'neutral' | null;
 }
 
 export interface RichExtensionsOptions {

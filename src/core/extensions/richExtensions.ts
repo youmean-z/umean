@@ -78,6 +78,7 @@ export function createRichExtensions(
     extensions.push(
       MermaidCodeBlock.configure({
         enabled: options.mermaid?.enabled ?? true,
+        theme: options.mermaid?.theme ?? 'dark',
       }),
     );
   }
