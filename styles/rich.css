@@ -4,6 +4,7 @@
  *
  * 可在此基础上覆盖变量或选择器以适配你的设计系统。
  * 语法高亮需另行引入 highlight.js 主题。
+ * 数学公式需引入 KaTeX CSS：import 'katex/dist/katex.min.css'
  */
 
 @import './rich-minimal.css';

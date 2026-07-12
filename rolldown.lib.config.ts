@@ -14,7 +14,7 @@ function collectTsEntries(dir: string): Record<string, string> {
       const fullPath = join(current, name);
       if (statSync(fullPath).isDirectory()) {
         walk(fullPath);
-      } else if (name.endsWith('.ts')) {
+      } else if (name.endsWith('.ts') && !name.endsWith('.test.ts')) {
         const key = relative(srcDir, fullPath)
           .replace(/\\/g, '/')
           .replace(/\.ts$/, '');

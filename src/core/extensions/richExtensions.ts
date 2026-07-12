@@ -1,6 +1,7 @@
 import type { AnyExtension } from '@tiptap/core';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import Image from '@tiptap/extension-image';
+import { Mathematics } from '@tiptap/extension-mathematics';
 import { Table } from '@tiptap/extension-table';
 import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
@@ -10,6 +11,7 @@ import TaskList from '@tiptap/extension-task-list';
 
 import type { RichExtensionsOptions } from '../types';
 import { getSharedLowlight } from '../utils/lowlight';
+import { MermaidCodeBlock } from './mermaidCodeBlock';
 import { TableAlignShortcut } from './tableAlignShortcut';
 import { TableShortcut } from './tableShortcut';
 
@@ -58,6 +60,25 @@ export function createRichExtensions(
             ...options.codeBlockLowlight,
           })
         : CodeBlockLowlight.configure({ lowlight: getSharedLowlight() }),
+    );
+  }
+
+  if (options.math !== false) {
+    extensions.push(
+      Mathematics.configure({
+        katexOptions: {
+          throwOnError: false,
+          ...options.math?.katexOptions,
+        },
+      }),
+    );
+  }
+
+  if (options.mermaid !== false && options.mermaid?.enabled !== false) {
+    extensions.push(
+      MermaidCodeBlock.configure({
+        enabled: options.mermaid?.enabled ?? true,
+      }),
     );
   }
 

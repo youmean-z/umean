@@ -31,13 +31,7 @@ export const TableBridge = new BridgeExtension({
   tiptapExtensionDeps: [TableRow, TableHeader, TableCell],
   onBridgeMessage: (editor: Editor, message: { type: TableEditorActionType }) => {
     if (message.type === TableEditorActionType.InsertTable) {
-      (editor.chain().focus() as unknown as { insertTable: (options: {
-        rows: number;
-        cols: number;
-        withHeaderRow: boolean;
-      }) => { run: () => boolean } })
-        .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-        .run();
+      editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
     }
 
     return false;
@@ -47,7 +41,7 @@ export const TableBridge = new BridgeExtension({
       sendBridgeMessage({ type: TableEditorActionType.InsertTable }),
   }),
   extendEditorState: (editor: Editor) => ({
-    canInsertTable: (editor.can() as unknown as { insertTable: () => boolean }).insertTable(),
+    canInsertTable: editor.can().insertTable(),
   }),
   extendCSS: tableBridgeCSS,
-} as any);
+});

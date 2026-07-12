@@ -1,0 +1,24 @@
+main:
+  push:
+    - name: ci
+      docker:
+        image: node:22
+      stages:
+        - name: install
+          script: npm ci
+        - name: typecheck
+          script: npm run typecheck
+        - name: test
+          script: npm test
+
+  pull_request:
+    - name: pr-check
+      docker:
+        image: node:22
+      stages:
+        - name: install
+          script: npm ci
+        - name: typecheck
+          script: npm run typecheck
+        - name: test
+          script: npm test

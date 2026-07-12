@@ -22,4 +22,6 @@ export type EditorCoreOptions = Partial<
   extensionOptions?: DefaultExtensionsOptions;
   /** 内容变更回调 */
   onUpdate?: (payload: EditorUpdatePayload) => void;
+  /** 编辑器销毁回调 */
+  onDestroy?: () => void;
 };

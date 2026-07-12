@@ -2,6 +2,7 @@ import type { JSONContent } from '@tiptap/core';
 import type { EditorOptions } from '@tiptap/core';
 import type { CodeBlockLowlightOptions } from '@tiptap/extension-code-block-lowlight';
 import type { ImageOptions } from '@tiptap/extension-image';
+import type { KatexOptions } from 'katex';
 import type { TableOptions } from '@tiptap/extension-table';
 import type { TaskItemOptions } from '@tiptap/extension-task-item';
 import type { TaskListOptions } from '@tiptap/extension-task-list';
@@ -21,6 +22,16 @@ export interface HeadingPolicyOptions {
   placeholderContent?: string;
 }
 
+export interface MathOptions {
+  /** KaTeX 渲染选项 */
+  katexOptions?: KatexOptions;
+}
+
+export interface MermaidOptions {
+  /** 是否启用 Mermaid 实时渲染，默认 true */
+  enabled?: boolean;
+}
+
 export interface RichExtensionsOptions {
   image?: Partial<ImageOptions> | false;
   taskList?:
@@ -35,6 +46,10 @@ export interface RichExtensionsOptions {
         table?: Partial<TableOptions>;
       };
   codeBlockLowlight?: Partial<CodeBlockLowlightOptions> | false;
+  /** 数学公式（LaTeX），默认启用 */
+  math?: MathOptions | false;
+  /** Mermaid 流程图渲染，默认启用 */
+  mermaid?: MermaidOptions | false;
 }
 
 export interface DefaultExtensionsOptions {

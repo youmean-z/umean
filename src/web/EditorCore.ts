@@ -6,6 +6,7 @@ import type { EditorCoreOptions } from './types';
 
 export class EditorCore {
   readonly editor: Editor;
+  private _onDestroy?: () => void;
 
   constructor(options: EditorCoreOptions = {}) {
     const {
@@ -14,8 +15,11 @@ export class EditorCore {
       content = emptyDoc,
       contentType = 'json',
       onUpdate,
+      onDestroy,
       ...editorOptions
     } = options;
+
+    this._onDestroy = onDestroy;
 
     this.editor = new Editor({
       ...editorOptions,
@@ -57,12 +61,18 @@ export class EditorCore {
     this.editor.commands.setContent(markdown, { contentType: 'markdown' });
   }
 
-  mount(element: HTMLElement): void {
-    this.editor.mount(element);
+  /** @deprecated TipTap v3 no longer supports manual mount — pass `element` in constructor options instead. */
+  mount(_element: HTMLElement): void {
+    throw new Error(
+      'EditorCore.mount() is not supported in TipTap v3. Pass `element` in constructor options instead.',
+    );
   }
 
+  /** @deprecated TipTap v3 no longer supports manual unmount. */
   unmount(): void {
-    this.editor.unmount();
+    throw new Error(
+      'EditorCore.unmount() is not supported in TipTap v3. The editor is automatically unmounted on destroy.',
+    );
   }
 
   focus(): void {
@@ -70,6 +80,7 @@ export class EditorCore {
   }
 
   destroy(): void {
+    this._onDestroy?.();
     this.editor.destroy();
   }
 }

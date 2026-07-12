@@ -50,6 +50,8 @@ export type {
   HeadingPolicyMode,
   HeadingPolicyOptions,
   RichExtensionsOptions,
+  MathOptions,
+  MermaidOptions,
   TransformOptions,
   Editor,
   JSONContent,

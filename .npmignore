@@ -1,0 +1,15 @@
+src/
+test/
+tentap/editor-web/src/
+tentap/editor-web/index.html
+tentap/editor-web/index.tsx
+tentap/editor-web/AdvancedEditor.tsx
+tentap/editor-web/vite.config.ts
+tentap/editor-web/tsconfig.json
+tentap/scripts/
+node_modules/
+.git/
+*.config.ts
+tsconfig.json
+.gitignore
+.claude/

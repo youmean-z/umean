@@ -42,4 +42,4 @@ export const CodeBlockBridge = new BridgeExtension({
     isCodeBlockActive: editor.isActive('codeBlock'),
   }),
   extendCSS: codeBlockBridgeCSS,
-} as any);
+});

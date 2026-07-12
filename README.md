@@ -194,10 +194,16 @@ tentap/editor-web/  # TenTap WebView source
 # Install dependencies
 npm install
 
+# Type-check
+npm run typecheck
+
+# Run tests
+npm test
+
 # Build library (rolldown + tsc declarations)
 npm run build
 
-# Web demo (http://localhost:5173)
+# Web demo (http://localhost:5173/test/)
 npm run test:dev
 
 # TenTap WebView dev server

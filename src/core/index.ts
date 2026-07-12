@@ -1,9 +1,23 @@
 export { createDefaultExtensions, createRichExtensions, createTenTapSupplementalExtensions } from './extensions/defaultExtensions';
-export { createEditorPlaceholder } from './extensions/editorPlaceholder';
+export { createEditorPlaceholder, type EditorPlaceholderOptions } from './extensions/editorPlaceholder';
 export { HeadingPolicy } from './extensions/headingPolicy';
 export { MarkdownClipboard } from './extensions/markdownClipboard';
+export { MermaidCodeBlock, type MermaidCodeBlockOptions } from './extensions/mermaidCodeBlock';
 export { TableAlignShortcut } from './extensions/tableAlignShortcut';
 export { TableShortcut } from './extensions/tableShortcut';
+export {
+  applyHeadingPolicy,
+  createDocumentDoc,
+  createEmptyParagraphDoc,
+  isEmptyDocContent,
+  type ApplyHeadingPolicyOptions,
+} from './utils/headingPolicyUtils';
+export {
+  parseAlignSuffix,
+  applyAlignToTable,
+  findCellAtPos,
+  type TableAlign,
+} from './utils/tableUtils';
 export {
   createHeadlessEditor,
   jsonToHTML,
@@ -19,6 +33,8 @@ export {
   type DefaultExtensionsOptions,
   type HeadingPolicyMode,
   type HeadingPolicyOptions,
+  type MathOptions,
+  type MermaidOptions,
   type RichExtensionsOptions,
   type TransformOptions,
 } from './types';

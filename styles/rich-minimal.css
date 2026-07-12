@@ -54,6 +54,28 @@
   font-size: 0.9em;
 }
 
+/* Mermaid 流程图 NodeView */
+.umean-editor .ProseMirror .mermaid-nodeview {
+  margin: 0.75rem 0;
+}
+
+.umean-editor .ProseMirror .mermaid-preview {
+  overflow-x: auto;
+  cursor: pointer;
+}
+
+.umean-editor .ProseMirror .mermaid-preview svg {
+  max-width: 100%;
+  display: block;
+}
+
+/* KaTeX 数学公式 */
+.umean-editor .ProseMirror .katex-display {
+  margin: 0.75rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 .umean-editor .ProseMirror p.is-empty::before,
 .umean-editor .ProseMirror h1.is-empty::before,
 .umean-editor .ProseMirror h2.is-empty::before,

@@ -194,10 +194,16 @@ tentap/editor-web/  # TenTap WebView 源码
 # 安装依赖
 npm install
 
+# 类型检查
+npm run typecheck
+
+# 运行测试
+npm test
+
 # 编译库（rolldown + tsc 类型）
 npm run build
 
-# Web 测试页（http://localhost:5173）
+# Web 测试页（http://localhost:5173/test/）
 npm run test:dev
 
 # TenTap WebView 开发
