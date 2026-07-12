@@ -12,6 +12,7 @@ import TaskList from '@tiptap/extension-task-list';
 import type { RichExtensionsOptions } from '../types';
 import { getSharedLowlight } from '../utils/lowlight';
 import { MermaidCodeBlock } from './mermaidCodeBlock';
+import { InlineMathUnwrap } from './inlineMathUnwrap';
 import { TableAlignShortcut } from './tableAlignShortcut';
 import { TableShortcut } from './tableShortcut';
 
@@ -71,6 +72,7 @@ export function createRichExtensions(
           ...options.math?.katexOptions,
         },
       }),
+      InlineMathUnwrap,
     );
   }
 

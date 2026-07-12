@@ -1,6 +1,7 @@
 export { createDefaultExtensions, createRichExtensions, createTenTapSupplementalExtensions } from './extensions/defaultExtensions';
 export { createEditorPlaceholder, type EditorPlaceholderOptions } from './extensions/editorPlaceholder';
 export { HeadingPolicy } from './extensions/headingPolicy';
+export { InlineMathUnwrap, inlineMathToEditableText } from './extensions/inlineMathUnwrap';
 export { MarkdownClipboard } from './extensions/markdownClipboard';
 export { MermaidCodeBlock, type MermaidCodeBlockOptions } from './extensions/mermaidCodeBlock';
 export { TableAlignShortcut } from './extensions/tableAlignShortcut';

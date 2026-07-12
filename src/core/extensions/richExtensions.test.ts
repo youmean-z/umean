@@ -6,6 +6,7 @@ describe('createRichExtensions', () => {
     const exts = createRichExtensions();
     const names = exts.map((e: any) => e.name);
     expect(names).toContain('Mathematics');
+    expect(names).toContain('inlineMathUnwrap');
   });
 
   it('includes MermaidCodeBlock by default', () => {
@@ -18,6 +19,7 @@ describe('createRichExtensions', () => {
     const exts = createRichExtensions({ math: false });
     const names = exts.map((e: any) => e.name);
     expect(names).not.toContain('Mathematics');
+    expect(names).not.toContain('inlineMathUnwrap');
   });
 
   it('excludes MermaidCodeBlock when mermaid: false', () => {
