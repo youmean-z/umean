@@ -10,8 +10,8 @@ import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
 
 import type { RichExtensionsOptions } from '../types';
-import { getSharedLowlight } from '../utils/lowlight';
-import { CodeBlockToolbar } from './codeBlockNodeView';
+import { createCodeBlockLowlight } from '../utils/lowlight';
+import { CodeBlockEnter, CodeBlockToolbar } from './codeBlockNodeView';
 import { MermaidCodeBlock } from './mermaidCodeBlock';
 import { BlockMathWithNodeView } from './blockMathNodeView';
 import { InlineMathUnwrap } from './inlineMathUnwrap';
@@ -57,13 +57,28 @@ export function createRichExtensions(
   }
 
   if (options.codeBlockLowlight !== false) {
+    const codeBlockLanguageConfig = createCodeBlockLowlight(
+      options.codeBlockLanguages,
+    );
+    const defaultLanguage =
+      options.codeBlockLowlight &&
+      'defaultLanguage' in options.codeBlockLowlight &&
+      options.codeBlockLowlight.defaultLanguage
+        ? options.codeBlockLowlight.defaultLanguage
+        : codeBlockLanguageConfig.defaultLanguageId;
+
     extensions.push(
       options.codeBlockLowlight
         ? CodeBlockLowlight.configure({
-            lowlight: getSharedLowlight(),
+            lowlight: codeBlockLanguageConfig.lowlight,
+            defaultLanguage,
             ...options.codeBlockLowlight,
           })
-        : CodeBlockLowlight.configure({ lowlight: getSharedLowlight() }),
+        : CodeBlockLowlight.configure({
+            lowlight: codeBlockLanguageConfig.lowlight,
+            defaultLanguage,
+          }),
+      CodeBlockEnter,
     );
 
     const mermaidEnabled =
@@ -83,6 +98,8 @@ export function createRichExtensions(
             enabled: mermaidEnabled,
             theme: mermaidOptions?.theme ?? 'dark',
           },
+          languages: codeBlockLanguageConfig.languages,
+          aliasToId: codeBlockLanguageConfig.aliasToId,
         }),
       );
     }

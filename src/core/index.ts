@@ -10,6 +10,8 @@ export { InlineMathUnwrap, inlineMathToEditableText } from './extensions/inlineM
 export { MarkdownClipboard } from './extensions/markdownClipboard';
 export {
   CodeBlockToolbar,
+  CodeBlockEnter,
+  createCodeBlockEnterPlugin,
   type CodeBlockToolbarOptions,
 } from './extensions/codeBlockNodeView';
 export { MermaidCodeBlock, type MermaidCodeBlockOptions } from './extensions/mermaidCodeBlock';
@@ -34,7 +36,17 @@ export {
   jsonToMarkdown,
   markdownToJSON,
 } from './utils/transform';
-export { getSharedLowlight } from './utils/lowlight';
+export { getSharedLowlight, createCodeBlockLowlight } from './utils/lowlight';
+export {
+  DEFAULT_CODE_BLOCK_LANGUAGES,
+  resolveCodeBlockLanguageConfig,
+  resolveCodeBlockLanguageId,
+  findResolvedCodeBlockLanguage,
+  type CodeBlockLanguageDefinition,
+  type CodeBlockLanguageInput,
+  type CodeBlockLanguageConfig,
+  type ResolvedCodeBlockLanguage,
+} from './utils/codeBlockLanguages';
 
 export {
   DEFAULT_PLACEHOLDER_CONTENT,

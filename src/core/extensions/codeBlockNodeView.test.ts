@@ -2,18 +2,31 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import python from 'highlight.js/lib/languages/python';
 
-import { getSharedLowlight } from '../utils/lowlight';
-import { CodeBlockToolbar } from './codeBlockNodeView';
+import { createCodeBlockLowlight } from '../utils/lowlight';
+import { CodeBlockEnter, CodeBlockToolbar } from './codeBlockNodeView';
 
-const toolbarEditorExtensions = [
-  StarterKit.configure({ codeBlock: false }),
-  CodeBlockLowlight.configure({ lowlight: getSharedLowlight() }),
-  CodeBlockToolbar.configure({
-    toolbar: { enabled: true },
-    mermaid: { enabled: false },
-  }),
-];
+function createToolbarEditorExtensions(
+  languages?: Parameters<typeof createCodeBlockLowlight>[0],
+) {
+  const codeBlockLanguageConfig = createCodeBlockLowlight(languages);
+
+  return [
+    StarterKit.configure({ codeBlock: false }),
+    CodeBlockLowlight.configure({
+      lowlight: codeBlockLanguageConfig.lowlight,
+      defaultLanguage: codeBlockLanguageConfig.defaultLanguageId,
+    }),
+    CodeBlockEnter,
+    CodeBlockToolbar.configure({
+      toolbar: { enabled: true },
+      mermaid: { enabled: false },
+      languages: codeBlockLanguageConfig.languages,
+      aliasToId: codeBlockLanguageConfig.aliasToId,
+    }),
+  ];
+}
 
 describe('CodeBlockToolbar extension', () => {
   it('extension has correct name', () => {
@@ -50,7 +63,7 @@ describe('CodeBlockToolbar NodeView in editor', () => {
 
     const editor = new Editor({
       element: div,
-      extensions: toolbarEditorExtensions,
+      extensions: createToolbarEditorExtensions(),
       content: {
         type: 'doc',
         content: [
@@ -65,7 +78,7 @@ describe('CodeBlockToolbar NodeView in editor', () => {
 
     const nodeview = div.querySelector('.code-block-nodeview');
     expect(nodeview).not.toBeNull();
-    expect(div.querySelector('.code-block-toolbar__select')).not.toBeNull();
+    expect(div.querySelector('.code-block-toolbar__lang-trigger')).not.toBeNull();
     expect(div.querySelector('.code-block-toolbar__button')?.textContent).toBe('复制');
 
     editor.destroy();
@@ -78,7 +91,7 @@ describe('CodeBlockToolbar NodeView in editor', () => {
 
     const editor = new Editor({
       element: div,
-      extensions: toolbarEditorExtensions,
+      extensions: createToolbarEditorExtensions(),
       content: {
         type: 'doc',
         content: [
@@ -104,13 +117,13 @@ describe('CodeBlockToolbar NodeView in editor', () => {
     div.remove();
   });
 
-  it('changes code block language from toolbar select', () => {
+  it('only shows configured languages in toolbar select', () => {
     const div = document.createElement('div');
     document.body.appendChild(div);
 
     const editor = new Editor({
       element: div,
-      extensions: toolbarEditorExtensions,
+      extensions: createToolbarEditorExtensions(['js', 'css']),
       content: {
         type: 'doc',
         content: [
@@ -123,9 +136,42 @@ describe('CodeBlockToolbar NodeView in editor', () => {
       },
     });
 
-    const select = div.querySelector('.code-block-toolbar__select') as HTMLSelectElement;
-    select.value = 'python';
-    select.dispatchEvent(new Event('change', { bubbles: true }));
+    const options = div.querySelectorAll('.code-block-toolbar__lang-option');
+    const optionValues = [...options].map(
+      (option) => (option as HTMLElement).dataset.value,
+    );
+    expect(optionValues).toEqual(['text', 'javascript', 'css']);
+
+    editor.destroy();
+    div.remove();
+  });
+
+  it('changes code block language from toolbar select', () => {
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+
+    const editor = new Editor({
+      element: div,
+      extensions: createToolbarEditorExtensions([
+        'javascript',
+        { id: 'python', grammar: python, label: 'Python' },
+      ]),
+      content: {
+        type: 'doc',
+        content: [
+          {
+            type: 'codeBlock',
+            attrs: { language: 'javascript' },
+            content: [{ type: 'text', text: 'const x = 1' }],
+          },
+        ],
+      },
+    });
+
+    const pythonOption = div.querySelector(
+      '.code-block-toolbar__lang-option[data-value="python"]',
+    ) as HTMLElement;
+    pythonOption.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
 
     const json = editor.getJSON();
     const codeBlock = json.content?.[0];
@@ -145,7 +191,7 @@ describe('CodeBlockToolbar NodeView in editor', () => {
 
     const editor = new Editor({
       element: div,
-      extensions: toolbarEditorExtensions,
+      extensions: createToolbarEditorExtensions(),
       content: {
         type: 'doc',
         content: [
@@ -158,8 +204,84 @@ describe('CodeBlockToolbar NodeView in editor', () => {
       },
     });
 
-    const select = div.querySelector('.code-block-toolbar__select') as HTMLSelectElement;
-    expect(select.value).toBe('text');
+    const trigger = div.querySelector(
+      '.code-block-toolbar__lang-trigger',
+    ) as HTMLButtonElement;
+    expect(trigger.textContent).toBe('Plain Text');
+
+    editor.destroy();
+    div.remove();
+  });
+
+  it('omits highlight class when highlight is disabled', () => {
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+
+    const editor = new Editor({
+      element: div,
+      extensions: createToolbarEditorExtensions([
+        {
+          id: 'markdown',
+          grammar: python,
+          highlight: false,
+          label: 'Markdown',
+        },
+      ]),
+      content: {
+        type: 'doc',
+        content: [
+          {
+            type: 'codeBlock',
+            attrs: { language: 'markdown' },
+            content: [{ type: 'text', text: '# title' }],
+          },
+        ],
+      },
+    });
+
+    const code = div.querySelector('.code-block-source code');
+    expect(code?.className).toBe('');
+
+    editor.destroy();
+    div.remove();
+  });
+
+  it('inserts newline after <html> via Enter in xml code block', () => {
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+
+    const editor = new Editor({
+      element: div,
+      extensions: createToolbarEditorExtensions(['html']),
+      content: {
+        type: 'doc',
+        content: [
+          {
+            type: 'codeBlock',
+            attrs: { language: 'xml' },
+            content: [{ type: 'text', text: '<html>' }],
+          },
+        ],
+      },
+    });
+
+    editor.commands.focus('end');
+
+    const handled = editor.view.someProp(
+      'handleKeyDown',
+      (handler) =>
+        handler(
+          editor.view,
+          new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
+        ) ?? false,
+    );
+    expect(handled).toBe(true);
+
+    const codeBlock = editor.getJSON().content?.[0];
+    expect(codeBlock?.content?.[0]).toMatchObject({
+      type: 'text',
+      text: '<html>\n',
+    });
 
     editor.destroy();
     div.remove();

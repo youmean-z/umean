@@ -28,8 +28,16 @@ export function createTenTapTiptapOptions(
 }
 
 export { createTenTapBridges, type TenTapBridgesOptions } from './createTenTapBridges';
-export { TableBridge, TableEditorActionType } from './bridges/tableBridge';
-export { CodeBlockBridge, CodeBlockEditorActionType } from './bridges/codeBlockBridge';
+export {
+  TableBridge,
+  TableEditorActionType,
+} from './bridges/tableBridge';
+export {
+  CodeBlockBridge,
+  CodeBlockEditorActionType,
+  createCodeBlockBridge,
+  type CreateCodeBlockBridgeOptions,
+} from './bridges/codeBlockBridge';
 
 export {
   createDefaultExtensions,
@@ -53,6 +61,8 @@ export type {
   MathOptions,
   MermaidOptions,
   TransformOptions,
+  CodeBlockLanguageDefinition,
+  CodeBlockLanguageInput,
   Editor,
   JSONContent,
 } from '../core/index';

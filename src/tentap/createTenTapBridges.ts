@@ -4,13 +4,15 @@ import {
   TenTapStartKit,
 } from '@10play/tentap-editor';
 
-import type { HeadingPolicyOptions } from '../core/types';
-import { CodeBlockBridge } from './bridges/codeBlockBridge';
+import type { HeadingPolicyOptions, CodeBlockLanguageInput } from '../core/types';
+import { createCodeBlockBridge } from './bridges/codeBlockBridge';
 import { TableBridge } from './bridges/tableBridge';
 
 export interface TenTapBridgesOptions {
   /** 与 Web 一致的标题策略；`false` 时保留 TenTap 内置 PlaceholderBridge */
   headingPolicy?: HeadingPolicyOptions | false;
+  /** 代码块语言与高亮 grammar 配置 */
+  codeBlockLanguages?: CodeBlockLanguageInput[];
 }
 
 export function createTenTapBridges(options: TenTapBridgesOptions = {}) {
@@ -34,5 +36,9 @@ export function createTenTapBridges(options: TenTapBridgesOptions = {}) {
     );
   }
 
-  return [...bridges, TableBridge, CodeBlockBridge];
+  return [
+    ...bridges,
+    TableBridge,
+    createCodeBlockBridge({ languages: options.codeBlockLanguages }),
+  ];
 }

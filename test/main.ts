@@ -1,3 +1,4 @@
+import go from 'highlight.js/lib/languages/go';
 import { createEditor, type HeadingPolicyMode } from '../src/web/index.ts';
 
 const editorEl = document.querySelector('#editor');
@@ -20,6 +21,16 @@ $$
 \`\`\`javascript
 const message = 'hello umean';
 console.log(message);
+\`\`\`
+
+\`\`\`go
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("hello umean")
+}
 \`\`\`
 
 流程图（工具栏「图表 / 源码」切换 + 复制）：
@@ -53,6 +64,21 @@ const core = createEditor({
   contentType: 'markdown',
   extensionOptions: {
     headingPolicy: { mode: resolveHeadingPolicyMode() },
+    rich: {
+      codeBlockLanguages: [
+        'js',
+        'ts',
+        'html',
+        'css',
+        'markdown',
+        {
+          id: 'go',
+          grammar: go,
+          aliases: ['golang'],
+          label: 'Go',
+        },
+      ],
+    },
   },
   onUpdate: ({ json, html, markdown }) => {
     if (jsonOutputEl) {

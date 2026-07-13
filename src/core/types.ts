@@ -9,6 +9,8 @@ import type { TaskListOptions } from '@tiptap/extension-task-list';
 import type { MarkdownExtensionOptions } from '@tiptap/markdown';
 import type { StarterKitOptions } from '@tiptap/starter-kit';
 
+import type { CodeBlockLanguageInput } from './utils/codeBlockLanguages';
+
 export type HeadingPolicyMode = 'free' | 'document' | 'chunk';
 
 export const DEFAULT_PLACEHOLDER_TITLE = '请输入标题';
@@ -34,6 +36,8 @@ export interface MermaidOptions {
   theme?: 'default' | 'base' | 'dark' | 'forest' | 'neutral' | null;
 }
 
+export type { CodeBlockLanguageDefinition, CodeBlockLanguageInput } from './utils/codeBlockLanguages';
+
 export interface RichExtensionsOptions {
   image?: Partial<ImageOptions> | false;
   taskList?:
@@ -48,6 +52,12 @@ export interface RichExtensionsOptions {
         table?: Partial<TableOptions>;
       };
   codeBlockLowlight?: Partial<CodeBlockLowlightOptions> | false;
+  /**
+   * 代码块语言与高亮 grammar 配置。
+   * 支持简写（如 `'js'`）或完整对象（含 `grammar`、`aliases`、`label`、`highlight`）。
+   * 未配置时默认：javascript / typescript / xml(html) / css / markdown。
+   */
+  codeBlockLanguages?: CodeBlockLanguageInput[];
   /** 普通代码块顶栏（语言下拉、复制），默认启用 */
   codeBlockToolbar?: { enabled?: boolean } | false;
   /** 数学公式（LaTeX），默认启用 */

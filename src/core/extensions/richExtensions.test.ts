@@ -77,6 +77,24 @@ describe('createRichExtensions', () => {
     expect(mermaid.options?.enabled).toBe(true);
   });
 
+  it('configures code block lowlight from custom languages', () => {
+    const exts = createRichExtensions({
+      codeBlockLanguages: ['js', 'css'],
+      mermaid: false,
+    });
+    const codeBlock = exts.find((e: any) => e.name === 'codeBlock') as any;
+    const toolbar = exts.find((e: any) => e.name === 'codeBlockToolbar') as any;
+
+    expect(codeBlock.options?.lowlight?.listLanguages()).toEqual([
+      'javascript',
+      'css',
+    ]);
+    expect(toolbar.options?.languages?.map((item: any) => item.id)).toEqual([
+      'javascript',
+      'css',
+    ]);
+  });
+
   it('still includes image, taskList, table, codeBlock', () => {
     const exts = createRichExtensions();
     const names = exts.map((e: any) => e.name);
