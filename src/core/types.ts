@@ -48,6 +48,8 @@ export interface RichExtensionsOptions {
         table?: Partial<TableOptions>;
       };
   codeBlockLowlight?: Partial<CodeBlockLowlightOptions> | false;
+  /** 普通代码块顶栏（语言下拉、复制），默认启用 */
+  codeBlockToolbar?: { enabled?: boolean } | false;
   /** 数学公式（LaTeX），默认启用 */
   math?: MathOptions | false;
   /** Mermaid 流程图渲染，默认启用 */

@@ -1,6 +1,7 @@
 import { Extension } from '@tiptap/core';
 import type { JSONContent } from '@tiptap/core';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
+import type { EditorView } from '@tiptap/pm/view';
 
 const MARKDOWN_PATTERNS = [
   /^#{1,6}\s/m,
@@ -33,6 +34,10 @@ function fragmentToJSON(content: {
   return { type: 'doc', content: nodes };
 }
 
+function isSelectionInCodeBlock(view: EditorView): boolean {
+  return view.state.selection.$from.parent.type.name === 'codeBlock';
+}
+
 function shouldParseAsMarkdown(text: string, html?: string): boolean {
   const normalized = text.trim();
   if (!normalized) {
@@ -57,8 +62,12 @@ export const MarkdownClipboard = Extension.create({
       new Plugin({
         key: new PluginKey('markdownClipboard'),
         props: {
-          handlePaste(_view, event) {
+          handlePaste(view, event) {
             if (!editor.markdown) {
+              return false;
+            }
+
+            if (isSelectionInCodeBlock(view)) {
               return false;
             }
 

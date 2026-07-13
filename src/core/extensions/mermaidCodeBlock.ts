@@ -1,5 +1,5 @@
 import { Extension } from '@tiptap/core';
-import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state';
+import { TextSelection } from '@tiptap/pm/state';
 import type { EditorView, NodeView, ViewMutationRecord } from '@tiptap/pm/view';
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 
@@ -10,21 +10,27 @@ export interface MermaidCodeBlockOptions {
   theme?: 'default' | 'base' | 'dark' | 'forest' | 'neutral' | null;
 }
 
-const mermaidPluginKey = new PluginKey('mermaidCodeBlock');
+export interface MermaidNodeViewOptions {
+  theme?: MermaidCodeBlockOptions['theme'];
+}
 
 let mermaidInitialized = false;
 let mermaidTheme: MermaidCodeBlockOptions['theme'] = 'dark';
 
-async function ensureMermaidInitialized(): Promise<typeof import('mermaid')['default']> {
+async function ensureMermaidInitialized(
+  theme: MermaidCodeBlockOptions['theme'] = mermaidTheme,
+): Promise<typeof import('mermaid')['default']> {
   const { default: mermaid } = await import('mermaid');
+  const nextTheme = theme ?? 'dark';
 
-  if (!mermaidInitialized) {
+  if (!mermaidInitialized || mermaidTheme !== nextTheme) {
     mermaid.initialize({
       startOnLoad: false,
-      theme: mermaidTheme ?? 'dark',
+      theme: nextTheme,
       suppressErrorRendering: true,
     });
     mermaidInitialized = true;
+    mermaidTheme = nextTheme;
   }
 
   return mermaid;
@@ -33,16 +39,18 @@ async function ensureMermaidInitialized(): Promise<typeof import('mermaid')['def
 
 /**
  * 为 language=mermaid 的 codeBlock 创建 NodeView：
- * - 工具栏「图表 / 代码」按钮手动切换预览与源码编辑
- * - 空块默认代码态；已有内容默认图表预览
+ * - 工具栏「图表 / 源码」切换预览与源码编辑，右侧复制按钮
+ * - 空块默认源码态；已有内容默认图表预览
  */
-class MermaidNodeView implements NodeView {
+export class MermaidNodeView implements NodeView {
   dom: HTMLElement;
   contentDOM: HTMLElement;
 
   private toolbar: HTMLElement;
+  private tabs: HTMLElement;
   private previewButton: HTMLButtonElement;
-  private codeButton: HTMLButtonElement;
+  private sourceButton: HTMLButtonElement;
+  private copyButton: HTMLButtonElement;
   private previewDom: HTMLElement;
   private node: ProseMirrorNode;
   private view: EditorView;
@@ -50,15 +58,20 @@ class MermaidNodeView implements NodeView {
   private isPreview = false;
   destroyed = false;
   private renderSeq = 0;
+  private copyResetTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(
     node: ProseMirrorNode,
     view: EditorView,
     getPos: () => number | undefined,
+    options: MermaidNodeViewOptions = {},
   ) {
     this.node = node;
     this.view = view;
     this.getPos = getPos;
+    if (options.theme !== undefined) {
+      mermaidTheme = options.theme;
+    }
 
     this.dom = document.createElement('div');
     this.dom.className = 'mermaid-nodeview';
@@ -66,6 +79,9 @@ class MermaidNodeView implements NodeView {
     this.toolbar = document.createElement('div');
     this.toolbar.className = 'mermaid-toolbar';
     this.toolbar.setAttribute('contenteditable', 'false');
+
+    this.tabs = document.createElement('div');
+    this.tabs.className = 'mermaid-toolbar__tabs';
 
     this.previewButton = document.createElement('button');
     this.previewButton.type = 'button';
@@ -76,16 +92,26 @@ class MermaidNodeView implements NodeView {
       this.enterPreviewMode();
     });
 
-    this.codeButton = document.createElement('button');
-    this.codeButton.type = 'button';
-    this.codeButton.className = 'mermaid-toolbar__button';
-    this.codeButton.textContent = '代码';
-    this.codeButton.addEventListener('mousedown', (event) => {
+    this.sourceButton = document.createElement('button');
+    this.sourceButton.type = 'button';
+    this.sourceButton.className = 'mermaid-toolbar__button';
+    this.sourceButton.textContent = '源码';
+    this.sourceButton.addEventListener('mousedown', (event) => {
       event.preventDefault();
       this.enterEditMode();
     });
 
-    this.toolbar.append(this.previewButton, this.codeButton);
+    this.copyButton = document.createElement('button');
+    this.copyButton.type = 'button';
+    this.copyButton.className = 'mermaid-toolbar__button mermaid-toolbar__copy';
+    this.copyButton.textContent = '复制';
+    this.copyButton.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+      void this.copySource();
+    });
+
+    this.tabs.append(this.previewButton, this.sourceButton);
+    this.toolbar.append(this.tabs, this.copyButton);
     this.dom.appendChild(this.toolbar);
 
     const sourceDom = document.createElement('pre');
@@ -150,13 +176,16 @@ class MermaidNodeView implements NodeView {
 
   destroy(): void {
     this.destroyed = true;
+    if (this.copyResetTimer) {
+      clearTimeout(this.copyResetTimer);
+    }
   }
 
   private syncMode(): void {
     this.dom.classList.toggle('mermaid-nodeview--preview', this.isPreview);
     this.dom.classList.toggle('mermaid-nodeview--code', !this.isPreview);
     this.previewButton.setAttribute('aria-pressed', String(this.isPreview));
-    this.codeButton.setAttribute('aria-pressed', String(!this.isPreview));
+    this.sourceButton.setAttribute('aria-pressed', String(!this.isPreview));
   }
 
   private enterEditMode(): void {
@@ -194,6 +223,27 @@ class MermaidNodeView implements NodeView {
     this.view.focus();
   }
 
+  private async copySource(): Promise<void> {
+    const text = this.node.textContent;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      this.copyButton.textContent = '已复制';
+    } catch {
+      this.copyButton.textContent = '复制失败';
+    }
+
+    if (this.copyResetTimer) {
+      clearTimeout(this.copyResetTimer);
+    }
+
+    this.copyResetTimer = setTimeout(() => {
+      this.copyButton.textContent = '复制';
+    }, 2000);
+
+    this.focusSource();
+  }
+
   private async renderPreview(): Promise<void> {
     const source = this.node.textContent;
     const seq = ++this.renderSeq;
@@ -220,10 +270,12 @@ class MermaidNodeView implements NodeView {
 }
 
 /**
- * Mermaid 流程图 NodeView 扩展。
+ * Mermaid 配置扩展（保留名称以兼容旧配置）。
  *
- * 依赖 CodeBlockLowlight 节点：当代码块语言为 mermaid 时
- * 使用 NodeView 实现图表/代码双态切换（工具栏按钮控制）。
+ * **注意**：NodeView 注册已迁移至 CodeBlockToolbar，此扩展不再注册任何
+ * Plugin 或 NodeView。`enabled` / `theme` 选项仅作为配置值存储，实际
+ * 行为由 CodeBlockToolbar 控制。直接使用此扩展（绕过 createRichExtensions）
+ * 时，`enabled: false` 不会禁用 Mermaid 渲染。
  */
 export const MermaidCodeBlock = Extension.create<MermaidCodeBlockOptions>({
   name: 'mermaidCodeBlock',
@@ -233,30 +285,6 @@ export const MermaidCodeBlock = Extension.create<MermaidCodeBlockOptions>({
       enabled: true,
       theme: 'dark' as const,
     };
-  },
-
-  addProseMirrorPlugins() {
-    if (!this.options.enabled) return [];
-
-    mermaidTheme = this.options.theme;
-
-    return [
-      new Plugin({
-        key: mermaidPluginKey,
-
-        props: {
-          nodeViews: {
-            codeBlock: ((node: ProseMirrorNode, view: EditorView, getPos: () => number | undefined) => {
-              if (node.attrs.language !== 'mermaid') {
-                return undefined;
-              }
-
-              return new MermaidNodeView(node, view, getPos);
-            }) as any,
-          },
-        },
-      }),
-    ];
   },
 });
 

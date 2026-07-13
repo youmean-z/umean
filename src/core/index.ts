@@ -8,6 +8,10 @@ export {
 export { HeadingPolicy } from './extensions/headingPolicy';
 export { InlineMathUnwrap, inlineMathToEditableText } from './extensions/inlineMathUnwrap';
 export { MarkdownClipboard } from './extensions/markdownClipboard';
+export {
+  CodeBlockToolbar,
+  type CodeBlockToolbarOptions,
+} from './extensions/codeBlockNodeView';
 export { MermaidCodeBlock, type MermaidCodeBlockOptions } from './extensions/mermaidCodeBlock';
 export { TableAlignShortcut } from './extensions/tableAlignShortcut';
 export { TableShortcut } from './extensions/tableShortcut';

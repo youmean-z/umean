@@ -11,6 +11,7 @@ import TaskList from '@tiptap/extension-task-list';
 
 import type { RichExtensionsOptions } from '../types';
 import { getSharedLowlight } from '../utils/lowlight';
+import { CodeBlockToolbar } from './codeBlockNodeView';
 import { MermaidCodeBlock } from './mermaidCodeBlock';
 import { BlockMathWithNodeView } from './blockMathNodeView';
 import { InlineMathUnwrap } from './inlineMathUnwrap';
@@ -21,6 +22,7 @@ export function createRichExtensions(
   options: RichExtensionsOptions = {},
 ): AnyExtension[] {
   const extensions: AnyExtension[] = [];
+  const mermaidOptions = options.mermaid === false ? undefined : options.mermaid;
 
   if (options.image !== false) {
     extensions.push(
@@ -63,6 +65,27 @@ export function createRichExtensions(
           })
         : CodeBlockLowlight.configure({ lowlight: getSharedLowlight() }),
     );
+
+    const mermaidEnabled =
+      options.mermaid !== false && mermaidOptions?.enabled !== false;
+    const toolbarEnabled =
+      options.codeBlockToolbar !== false &&
+      options.codeBlockToolbar?.enabled !== false;
+
+    if (mermaidEnabled || toolbarEnabled) {
+      extensions.push(
+        CodeBlockToolbar.configure({
+          enabled: true,
+          toolbar: {
+            enabled: toolbarEnabled,
+          },
+          mermaid: {
+            enabled: mermaidEnabled,
+            theme: mermaidOptions?.theme ?? 'dark',
+          },
+        }),
+      );
+    }
   }
 
   if (options.math !== false) {
@@ -83,11 +106,11 @@ export function createRichExtensions(
     );
   }
 
-  if (options.mermaid !== false && options.mermaid?.enabled !== false) {
+  if (options.mermaid !== false && mermaidOptions?.enabled !== false) {
     extensions.push(
       MermaidCodeBlock.configure({
-        enabled: options.mermaid?.enabled ?? true,
-        theme: options.mermaid?.theme ?? 'dark',
+        enabled: mermaidOptions?.enabled ?? true,
+        theme: mermaidOptions?.theme ?? 'dark',
       }),
     );
   }

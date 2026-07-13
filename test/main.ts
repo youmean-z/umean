@@ -15,7 +15,14 @@ $$
 E=mc^2
 $$
 
-流程图（工具栏「图表 / 代码」切换）：
+代码块（顶栏语言下拉 + 复制）：
+
+\`\`\`javascript
+const message = 'hello umean';
+console.log(message);
+\`\`\`
+
+流程图（工具栏「图表 / 源码」切换 + 复制）：
 
 \`\`\`mermaid
 graph TD

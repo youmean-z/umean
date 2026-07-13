@@ -14,6 +14,7 @@ describe('createRichExtensions', () => {
     const exts = createRichExtensions();
     const names = exts.map((e: any) => e.name);
     expect(names).toContain('mermaidCodeBlock');
+    expect(names).toContain('codeBlockToolbar');
   });
 
   it('excludes math when math: false', () => {
@@ -22,6 +23,30 @@ describe('createRichExtensions', () => {
     expect(names).not.toContain('inlineMath');
     expect(names).not.toContain('blockMath');
     expect(names).not.toContain('inlineMathUnwrap');
+  });
+
+  it('excludes CodeBlockToolbar when codeBlockLowlight is false', () => {
+    const exts = createRichExtensions({ codeBlockLowlight: false, mermaid: false });
+    const names = exts.map((e: any) => e.name);
+    expect(names).not.toContain('codeBlockToolbar');
+  });
+
+  it('excludes CodeBlockToolbar when codeBlockToolbar is disabled', () => {
+    const exts = createRichExtensions({
+      codeBlockToolbar: { enabled: false },
+      mermaid: false,
+    });
+    const names = exts.map((e: any) => e.name);
+    expect(names).not.toContain('codeBlockToolbar');
+  });
+
+  it('still includes CodeBlockToolbar when only mermaid is enabled', () => {
+    const exts = createRichExtensions({
+      codeBlockToolbar: { enabled: false },
+      mermaid: { enabled: true },
+    });
+    const names = exts.map((e: any) => e.name);
+    expect(names).toContain('codeBlockToolbar');
   });
 
   it('excludes MermaidCodeBlock when mermaid: false', () => {

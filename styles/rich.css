@@ -28,13 +28,13 @@
   font-weight: 600;
 }
 
-.umean-editor .ProseMirror pre {
+.umean-editor .ProseMirror pre:not(.mermaid-source):not(.code-block-source) {
   background: #0f172a;
   color: #e2e8f0;
   border-radius: 8px;
   padding: 0.75rem 1rem;
 }
 
-.umean-editor .ProseMirror pre code {
+.umean-editor .ProseMirror pre:not(.mermaid-source):not(.code-block-source) code {
   color: inherit;
 }

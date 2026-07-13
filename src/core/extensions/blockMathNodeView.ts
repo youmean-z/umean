@@ -13,16 +13,36 @@ export interface BlockMathNodeViewOptions {
 const blockMathNodeViewPluginKey = new PluginKey('blockMathNodeView');
 const activeBlockMathNodeViews = new Set<BlockMathNodeView>();
 
+/** 根据内容自动调整块级公式源码 textarea 高度，避免内部滚动条 */
+export function resizeBlockMathSourceArea(sourceArea: HTMLTextAreaElement): void {
+  sourceArea.style.height = 'auto';
+
+  let nextHeight = sourceArea.scrollHeight;
+  if (nextHeight <= 0) {
+    const styles = getComputedStyle(sourceArea);
+    const lineHeight = Number.parseFloat(styles.lineHeight) || 21;
+    const paddingY =
+      (Number.parseFloat(styles.paddingTop) || 0) +
+      (Number.parseFloat(styles.paddingBottom) || 0);
+    const lineCount = Math.max(1, sourceArea.value.split('\n').length);
+    nextHeight = lineCount * lineHeight + paddingY;
+  }
+
+  sourceArea.style.height = `${nextHeight}px`;
+}
+
 /**
- * 块级公式 NodeView：工具栏「公式 / LaTeX」切换预览与源码编辑。
- * 空块默认 LaTeX 编辑；Backspace 选中块时进入编辑态。
+ * 块级公式 NodeView：工具栏「公式 / 源码」切换预览与源码编辑，右侧复制按钮。
+ * 空块默认源码编辑；Backspace 选中块时进入编辑态。
  */
 class BlockMathNodeView implements NodeView {
   dom: HTMLElement;
 
   private toolbar: HTMLElement;
+  private tabs: HTMLElement;
   private previewButton: HTMLButtonElement;
-  private latexButton: HTMLButtonElement;
+  private sourceButton: HTMLButtonElement;
+  private copyButton: HTMLButtonElement;
   private sourceArea: HTMLTextAreaElement;
   private previewDom: HTMLElement;
   private node: ProseMirrorNode;
@@ -31,6 +51,7 @@ class BlockMathNodeView implements NodeView {
   private katexOptions: KatexOptions | undefined;
   private isPreview = false;
   destroyed = false;
+  private copyResetTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(
     node: ProseMirrorNode,
@@ -50,6 +71,9 @@ class BlockMathNodeView implements NodeView {
     this.toolbar.className = 'block-math-toolbar';
     this.toolbar.setAttribute('contenteditable', 'false');
 
+    this.tabs = document.createElement('div');
+    this.tabs.className = 'block-math-toolbar__tabs';
+
     this.previewButton = document.createElement('button');
     this.previewButton.type = 'button';
     this.previewButton.className = 'block-math-toolbar__button';
@@ -59,16 +83,26 @@ class BlockMathNodeView implements NodeView {
       this.enterPreviewMode();
     });
 
-    this.latexButton = document.createElement('button');
-    this.latexButton.type = 'button';
-    this.latexButton.className = 'block-math-toolbar__button';
-    this.latexButton.textContent = 'LaTeX';
-    this.latexButton.addEventListener('mousedown', (event) => {
+    this.sourceButton = document.createElement('button');
+    this.sourceButton.type = 'button';
+    this.sourceButton.className = 'block-math-toolbar__button';
+    this.sourceButton.textContent = '源码';
+    this.sourceButton.addEventListener('mousedown', (event) => {
       event.preventDefault();
       this.enterEditMode();
     });
 
-    this.toolbar.append(this.previewButton, this.latexButton);
+    this.copyButton = document.createElement('button');
+    this.copyButton.type = 'button';
+    this.copyButton.className = 'block-math-toolbar__button block-math-toolbar__copy';
+    this.copyButton.textContent = '复制';
+    this.copyButton.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+      void this.copySource();
+    });
+
+    this.tabs.append(this.previewButton, this.sourceButton);
+    this.toolbar.append(this.tabs, this.copyButton);
     this.dom.appendChild(this.toolbar);
 
     this.sourceArea = document.createElement('textarea');
@@ -77,9 +111,11 @@ class BlockMathNodeView implements NodeView {
     this.sourceArea.placeholder = '多行公式用 \\\\ 换行，例如：E=mc^2 \\\\ \\sum_{i=1}^{n} i';
     this.sourceArea.value = node.attrs.latex ?? '';
     this.sourceArea.addEventListener('input', () => {
+      this.resizeSourceArea();
       this.commitLatex(this.sourceArea.value);
     });
     this.dom.appendChild(this.sourceArea);
+    this.resizeSourceArea();
 
     this.previewDom = document.createElement('div');
     this.previewDom.className = 'block-math-preview';
@@ -105,6 +141,7 @@ class BlockMathNodeView implements NodeView {
 
     if (!this.isPreview && document.activeElement !== this.sourceArea) {
       this.sourceArea.value = String(node.attrs.latex ?? '');
+      this.resizeSourceArea();
     }
 
     if (this.isPreview) {
@@ -129,6 +166,9 @@ class BlockMathNodeView implements NodeView {
   destroy(): void {
     this.destroyed = true;
     activeBlockMathNodeViews.delete(this);
+    if (this.copyResetTimer) {
+      clearTimeout(this.copyResetTimer);
+    }
   }
 
   matchesPos(pos: number): boolean {
@@ -137,6 +177,7 @@ class BlockMathNodeView implements NodeView {
 
   enterEditMode(): void {
     if (!this.isPreview) {
+      this.resizeSourceArea();
       this.sourceArea.focus();
       return;
     }
@@ -144,6 +185,7 @@ class BlockMathNodeView implements NodeView {
     this.isPreview = false;
     this.sourceArea.value = String(this.node.attrs.latex ?? '');
     this.syncMode();
+    this.resizeSourceArea();
     this.sourceArea.focus();
   }
 
@@ -160,7 +202,7 @@ class BlockMathNodeView implements NodeView {
     this.dom.classList.toggle('block-math-nodeview--preview', this.isPreview);
     this.dom.classList.toggle('block-math-nodeview--edit', !this.isPreview);
     this.previewButton.setAttribute('aria-pressed', String(this.isPreview));
-    this.latexButton.setAttribute('aria-pressed', String(!this.isPreview));
+    this.sourceButton.setAttribute('aria-pressed', String(!this.isPreview));
   }
 
   private commitLatex(latex: string): void {
@@ -179,7 +221,7 @@ class BlockMathNodeView implements NodeView {
     this.previewDom.innerHTML = '';
 
     if (!latex.trim()) {
-      this.previewDom.textContent = '(LaTeX 为空)';
+      this.previewDom.textContent = '(公式源码为空)';
       return;
     }
 
@@ -190,8 +232,44 @@ class BlockMathNodeView implements NodeView {
         ...this.katexOptions,
       });
     } catch {
-      this.previewDom.textContent = `(LaTeX 解析错误)\n${latex}`;
+      this.previewDom.textContent = `(公式解析错误)\n${latex}`;
     }
+  }
+
+  private focusSource(): void {
+    if (this.isPreview) {
+      this.enterEditMode();
+      return;
+    }
+
+    this.sourceArea.focus();
+    const end = this.sourceArea.value.length;
+    this.sourceArea.setSelectionRange(end, end);
+  }
+
+  private async copySource(): Promise<void> {
+    const text = String(this.node.attrs.latex ?? '');
+
+    try {
+      await navigator.clipboard.writeText(text);
+      this.copyButton.textContent = '已复制';
+    } catch {
+      this.copyButton.textContent = '复制失败';
+    }
+
+    if (this.copyResetTimer) {
+      clearTimeout(this.copyResetTimer);
+    }
+
+    this.copyResetTimer = setTimeout(() => {
+      this.copyButton.textContent = '复制';
+    }, 2000);
+
+    this.focusSource();
+  }
+
+  private resizeSourceArea(): void {
+    resizeBlockMathSourceArea(this.sourceArea);
   }
 }
 

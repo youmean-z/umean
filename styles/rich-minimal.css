@@ -51,124 +51,63 @@
 .umean-editor .ProseMirror pre code {
   background: none;
   padding: 0;
-  font-size: 0.9em;
+  font-size: inherit;
 }
 
-/* Mermaid 流程图 NodeView（变量可在 .umean-editor 上覆盖以适配主题） */
-.umean-editor .ProseMirror .mermaid-nodeview {
-  --umean-mermaid-border: #334155;
-  --umean-mermaid-toolbar-bg: #172033;
-  --umean-mermaid-toolbar-border: #334155;
-  --umean-mermaid-button-color: #94a3b8;
-  --umean-mermaid-button-hover-bg: #334155;
-  --umean-mermaid-button-hover-color: #e2e8f0;
-  --umean-mermaid-button-active-bg: #1e293b;
-  --umean-mermaid-button-active-border: #475569;
-  --umean-mermaid-button-active-color: #f1f5f9;
-  --umean-mermaid-preview-bg: #0f172a;
-
-  margin: 0.75rem 0;
-  border: 1px solid var(--umean-mermaid-border);
-  border-radius: 0.5rem;
-  overflow: hidden;
-  background: var(--umean-mermaid-preview-bg);
-}
-
-.umean-editor .ProseMirror .mermaid-toolbar {
-  display: flex;
-  gap: 0.25rem;
-  padding: 0.375rem 0.5rem;
-  border-bottom: 1px solid var(--umean-mermaid-toolbar-border);
-  background: var(--umean-mermaid-toolbar-bg);
-}
-
-.umean-editor .ProseMirror .mermaid-toolbar__button {
-  appearance: none;
-  border: 1px solid transparent;
-  border-radius: 0.375rem;
-  background: transparent;
-  color: var(--umean-mermaid-button-color);
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.8125rem;
-  line-height: 1.25rem;
-  padding: 0.125rem 0.625rem;
-}
-
-.umean-editor .ProseMirror .mermaid-toolbar__button:hover {
-  background: var(--umean-mermaid-button-hover-bg);
-  color: var(--umean-mermaid-button-hover-color);
-}
-
-.umean-editor .ProseMirror .mermaid-toolbar__button[aria-pressed='true'] {
-  background: var(--umean-mermaid-button-active-bg);
-  border-color: var(--umean-mermaid-button-active-border);
-  color: var(--umean-mermaid-button-active-color);
-  font-weight: 600;
-}
-
-.umean-editor .ProseMirror .mermaid-nodeview--preview .mermaid-source {
-  display: none;
-}
-
-.umean-editor .ProseMirror .mermaid-nodeview--code .mermaid-preview {
-  display: none;
-}
-
-.umean-editor .ProseMirror .mermaid-source {
-  margin: 0;
-  background: transparent;
-}
-
-.umean-editor .ProseMirror .mermaid-preview {
-  overflow-x: auto;
-  padding: 0.75rem;
-  background: var(--umean-mermaid-preview-bg);
-  cursor: default;
-  user-select: none;
-  pointer-events: none;
-}
-
-.umean-editor .ProseMirror .mermaid-preview svg {
-  max-width: 100%;
-  display: block;
-  margin: 0 auto;
-}
-
-/* 块级公式 NodeView（复用 Mermaid 工具栏色板变量） */
+/* --------------------------------------------------------------------------
+   NodeView 公共样式：代码块 / Mermaid / 块级公式
+   -------------------------------------------------------------------------- */
+.umean-editor .ProseMirror .mermaid-nodeview,
+.umean-editor .ProseMirror .code-block-nodeview,
 .umean-editor .ProseMirror .block-math-nodeview {
-  --umean-block-math-border: var(--umean-mermaid-border, #334155);
-  --umean-block-math-toolbar-bg: var(--umean-mermaid-toolbar-bg, #172033);
-  --umean-block-math-toolbar-border: var(--umean-mermaid-toolbar-border, #334155);
-  --umean-block-math-button-color: var(--umean-mermaid-button-color, #94a3b8);
-  --umean-block-math-button-hover-bg: var(--umean-mermaid-button-hover-bg, #334155);
-  --umean-block-math-button-hover-color: var(--umean-mermaid-button-hover-color, #e2e8f0);
-  --umean-block-math-button-active-bg: var(--umean-mermaid-button-active-bg, #1e293b);
-  --umean-block-math-button-active-border: var(--umean-mermaid-button-active-border, #475569);
-  --umean-block-math-button-active-color: var(--umean-mermaid-button-active-color, #f1f5f9);
-  --umean-block-math-preview-bg: var(--umean-mermaid-preview-bg, #0f172a);
+  --umean-panel-border: #334155;
+  --umean-panel-toolbar-bg: #172033;
+  --umean-panel-toolbar-border: #334155;
+  --umean-panel-button-color: #94a3b8;
+  --umean-panel-button-hover-bg: #334155;
+  --umean-panel-button-hover-color: #e2e8f0;
+  --umean-panel-button-active-bg: #1e293b;
+  --umean-panel-button-active-border: #475569;
+  --umean-panel-button-active-color: #f1f5f9;
+  --umean-panel-surface-bg: #0f172a;
+  --umean-panel-source-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --umean-panel-source-size: 0.875rem;
+  --umean-panel-source-line-height: 1.5;
+  --umean-panel-source-padding: 0.75rem;
 
   margin: 0.75rem 0;
-  border: 1px solid var(--umean-block-math-border);
+  border: 1px solid var(--umean-panel-border);
   border-radius: 0.5rem;
   overflow: hidden;
-  background: var(--umean-block-math-preview-bg);
+  background: var(--umean-panel-surface-bg);
 }
 
+.umean-editor .ProseMirror .mermaid-toolbar,
+.umean-editor .ProseMirror .code-block-toolbar,
 .umean-editor .ProseMirror .block-math-toolbar {
   display: flex;
-  gap: 0.25rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   padding: 0.375rem 0.5rem;
-  border-bottom: 1px solid var(--umean-block-math-toolbar-border);
-  background: var(--umean-block-math-toolbar-bg);
+  border-bottom: 1px solid var(--umean-panel-toolbar-border);
+  background: var(--umean-panel-toolbar-bg);
 }
 
+.umean-editor .ProseMirror .mermaid-toolbar__tabs,
+.umean-editor .ProseMirror .block-math-toolbar__tabs {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.umean-editor .ProseMirror .mermaid-toolbar__button,
+.umean-editor .ProseMirror .code-block-toolbar__button,
 .umean-editor .ProseMirror .block-math-toolbar__button {
   appearance: none;
   border: 1px solid transparent;
   border-radius: 0.375rem;
   background: transparent;
-  color: var(--umean-block-math-button-color);
+  color: var(--umean-panel-button-color);
   cursor: pointer;
   font: inherit;
   font-size: 0.8125rem;
@@ -176,39 +115,55 @@
   padding: 0.125rem 0.625rem;
 }
 
-.umean-editor .ProseMirror .block-math-toolbar__button:hover {
-  background: var(--umean-block-math-button-hover-bg);
-  color: var(--umean-block-math-button-hover-color);
+.umean-editor .ProseMirror .mermaid-toolbar__button:hover,
+.umean-editor .ProseMirror .code-block-toolbar__button:hover,
+.umean-editor .ProseMirror .block-math-toolbar__button:hover,
+.umean-editor .ProseMirror .code-block-toolbar__select:hover,
+.umean-editor .ProseMirror .code-block-toolbar__select:focus-visible {
+  background: var(--umean-panel-button-hover-bg);
+  color: var(--umean-panel-button-hover-color);
 }
 
+.umean-editor .ProseMirror .mermaid-toolbar__button[aria-pressed='true'],
 .umean-editor .ProseMirror .block-math-toolbar__button[aria-pressed='true'] {
-  background: var(--umean-block-math-button-active-bg);
-  border-color: var(--umean-block-math-button-active-border);
-  color: var(--umean-block-math-button-active-color);
+  background: var(--umean-panel-button-active-bg);
+  border-color: var(--umean-panel-button-active-border);
+  color: var(--umean-panel-button-active-color);
   font-weight: 600;
 }
 
-.umean-editor .ProseMirror .block-math-nodeview--preview .block-math-source {
-  display: none;
+.umean-editor .ProseMirror .code-block-source,
+.umean-editor .ProseMirror .mermaid-source {
+  margin: 0;
+  padding: var(--umean-panel-source-padding);
+  border-radius: 0;
+  background: transparent;
+  overflow-x: auto;
 }
 
-.umean-editor .ProseMirror .block-math-nodeview--edit .block-math-preview {
-  display: none;
+.umean-editor .ProseMirror .code-block-source code,
+.umean-editor .ProseMirror .mermaid-source code {
+  font-family: var(--umean-panel-source-font);
+  font-size: var(--umean-panel-source-size);
+  line-height: var(--umean-panel-source-line-height);
+  color: inherit;
 }
 
 .umean-editor .ProseMirror .block-math-source {
   display: block;
   width: 100%;
-  min-height: 4.5rem;
+  min-height: 0;
   margin: 0;
-  padding: 0.75rem;
+  padding: var(--umean-panel-source-padding);
   border: 0;
-  resize: vertical;
+  border-radius: 0;
+  resize: none;
+  overflow: hidden;
   background: transparent;
   color: inherit;
-  font-family: ui-monospace, monospace;
-  font-size: 0.875rem;
-  line-height: 1.5;
+  font-family: var(--umean-panel-source-font);
+  font-size: var(--umean-panel-source-size);
+  line-height: var(--umean-panel-source-line-height);
   box-sizing: border-box;
 }
 
@@ -223,13 +178,99 @@
   opacity: 1;
 }
 
+.umean-editor .ProseMirror .mermaid-preview,
 .umean-editor .ProseMirror .block-math-preview {
   overflow-x: auto;
-  padding: 0.75rem;
-  background: var(--umean-block-math-preview-bg);
+  overflow-y: visible;
+  padding: var(--umean-panel-source-padding);
+  background: var(--umean-panel-surface-bg);
   cursor: default;
   user-select: none;
   pointer-events: none;
+}
+
+/* Mermaid 流程图 NodeView */
+.umean-editor .ProseMirror .mermaid-nodeview {
+  --umean-mermaid-border: var(--umean-panel-border);
+  --umean-mermaid-toolbar-bg: var(--umean-panel-toolbar-bg);
+  --umean-mermaid-toolbar-border: var(--umean-panel-toolbar-border);
+  --umean-mermaid-button-color: var(--umean-panel-button-color);
+  --umean-mermaid-button-hover-bg: var(--umean-panel-button-hover-bg);
+  --umean-mermaid-button-hover-color: var(--umean-panel-button-hover-color);
+  --umean-mermaid-button-active-bg: var(--umean-panel-button-active-bg);
+  --umean-mermaid-button-active-border: var(--umean-panel-button-active-border);
+  --umean-mermaid-button-active-color: var(--umean-panel-button-active-color);
+  --umean-mermaid-preview-bg: var(--umean-panel-surface-bg);
+}
+
+.umean-editor .ProseMirror .mermaid-nodeview--preview .mermaid-source {
+  display: none;
+}
+
+.umean-editor .ProseMirror .mermaid-nodeview--code .mermaid-preview {
+  display: none;
+}
+
+.umean-editor .ProseMirror .mermaid-preview svg {
+  max-width: 100%;
+  display: block;
+  margin: 0 auto;
+}
+
+/* 普通代码块 NodeView */
+.umean-editor .ProseMirror .code-block-nodeview {
+  --umean-code-block-border: var(--umean-panel-border);
+  --umean-code-block-toolbar-bg: var(--umean-panel-toolbar-bg);
+  --umean-code-block-toolbar-border: var(--umean-panel-toolbar-border);
+  --umean-code-block-button-color: var(--umean-panel-button-color);
+  --umean-code-block-button-hover-bg: var(--umean-panel-button-hover-bg);
+  --umean-code-block-button-hover-color: var(--umean-panel-button-hover-color);
+  --umean-code-block-source-bg: var(--umean-panel-surface-bg);
+}
+
+.umean-editor .ProseMirror .code-block-toolbar__select {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: var(--umean-panel-button-hover-color);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  padding: 0.125rem 1.75rem 0.125rem 0.625rem;
+  max-width: 12rem;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 12px) calc(50% + 1px), calc(100% - 7px) calc(50% + 1px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+.umean-editor .ProseMirror .code-block-toolbar__select:focus-visible {
+  outline: none;
+}
+
+/* 块级公式 NodeView */
+.umean-editor .ProseMirror .block-math-nodeview {
+  --umean-block-math-border: var(--umean-panel-border);
+  --umean-block-math-toolbar-bg: var(--umean-panel-toolbar-bg);
+  --umean-block-math-toolbar-border: var(--umean-panel-toolbar-border);
+  --umean-block-math-button-color: var(--umean-panel-button-color);
+  --umean-block-math-button-hover-bg: var(--umean-panel-button-hover-bg);
+  --umean-block-math-button-hover-color: var(--umean-panel-button-hover-color);
+  --umean-block-math-button-active-bg: var(--umean-panel-button-active-bg);
+  --umean-block-math-button-active-border: var(--umean-panel-button-active-border);
+  --umean-block-math-button-active-color: var(--umean-panel-button-active-color);
+  --umean-block-math-preview-bg: var(--umean-panel-surface-bg);
+}
+
+.umean-editor .ProseMirror .block-math-nodeview--preview .block-math-source {
+  display: none;
+}
+
+.umean-editor .ProseMirror .block-math-nodeview--edit .block-math-preview {
+  display: none;
 }
 
 .umean-editor .ProseMirror .block-math-preview .katex-display {
