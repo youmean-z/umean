@@ -9,6 +9,18 @@ const markdownOutputEl = document.querySelector('#markdown-output');
 /** 公式 + Mermaid 流程图 demo 初始内容 */
 const DEMO_MARKDOWN = `# 公式与流程图测试
 
+链接：[umean](https://example.com) ；编辑完链接文字后，在链末按 → 即可继续写正文。
+
+行内代码 \`npm test\` 与高亮 ==重点内容== （快捷键 Mod-Shift-h）。
+
+> 这是普通引用。适合摘录他人原话。
+
+> [!info]
+> 这是提示块（Callout）。Slash 搜「提示」或「警告」可插入。
+
+> [!warning]
+> 修改生产配置前请先备份。
+
 行内公式：$E=mc^2$ 以及 $\\alpha + \\beta = \\gamma$
 
 $$
@@ -43,6 +55,8 @@ graph TD
     D --> B
 \`\`\`
 
+空行里输入 \`/\` 打开 Slash 菜单；选「图片」会走本地文件上传钩子。也可直接粘贴/拖入图片。
+
 `;
 
 function resolveHeadingPolicyMode(): HeadingPolicyMode {
@@ -54,6 +68,11 @@ function resolveHeadingPolicyMode(): HeadingPolicyMode {
   return 'free';
 }
 
+function resolveLocale(): 'zh-CN' | 'en' {
+  const locale = new URLSearchParams(window.location.search).get('locale');
+  return locale === 'en' ? 'en' : 'zh-CN';
+}
+
 if (!editorEl) {
   throw new Error('Missing #editor element');
 }
@@ -63,7 +82,25 @@ const core = createEditor({
   content: DEMO_MARKDOWN,
   contentType: 'markdown',
   extensionOptions: {
+    locale: resolveLocale(),
     headingPolicy: { mode: resolveHeadingPolicyMode() },
+    upload: {
+      onImageUpload: async ({ file, source }) => {
+        // demo：模拟上传延迟后用本地 Object URL（真实宿主应上传到 CDN 并返回 https URL）
+        console.info('[umean upload]', source, file.name, file.type);
+        await new Promise((resolve) => setTimeout(resolve, 250));
+        return {
+          src: URL.createObjectURL(file),
+          alt: file.name,
+        };
+      },
+      onFileUpload: async ({ file, source }) => {
+        console.info('[umean file upload]', source, file.name);
+        await new Promise((resolve) => setTimeout(resolve, 250));
+        const href = URL.createObjectURL(file);
+        return { href, text: file.name };
+      },
+    },
     rich: {
       codeBlockLanguages: [
         'js',

@@ -4,6 +4,7 @@ import StarterKit from '@tiptap/starter-kit';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import python from 'highlight.js/lib/languages/python';
 
+import { ZH_CN } from '../i18n';
 import { createCodeBlockLowlight } from '../utils/lowlight';
 import { CodeBlockEnter, CodeBlockToolbar } from './codeBlockNodeView';
 
@@ -79,7 +80,7 @@ describe('CodeBlockToolbar NodeView in editor', () => {
     const nodeview = div.querySelector('.code-block-nodeview');
     expect(nodeview).not.toBeNull();
     expect(div.querySelector('.code-block-toolbar__lang-trigger')).not.toBeNull();
-    expect(div.querySelector('.code-block-toolbar__button')?.textContent).toBe('复制');
+    expect(div.querySelector('.code-block-toolbar__button')?.textContent).toBe(ZH_CN.copy);
 
     editor.destroy();
     div.remove();
@@ -110,7 +111,7 @@ describe('CodeBlockToolbar NodeView in editor', () => {
     await vi.waitFor(() => {
       expect(writeText).toHaveBeenCalledWith("console.log('copy-me')");
     });
-    expect(copyButton.textContent).toBe('已复制');
+    expect(copyButton.textContent).toBe(ZH_CN.copied);
     expect(editor.state.selection.$from.parent.type.name).toBe('codeBlock');
 
     editor.destroy();
@@ -144,6 +145,45 @@ describe('CodeBlockToolbar NodeView in editor', () => {
 
     editor.destroy();
     div.remove();
+  });
+
+  it('portals language menu to body when opened', () => {
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+
+    const editor = new Editor({
+      element: div,
+      extensions: createToolbarEditorExtensions(['js', 'ts', 'css']),
+      content: {
+        type: 'doc',
+        content: [
+          {
+            type: 'codeBlock',
+            attrs: { language: 'javascript' },
+            content: [{ type: 'text', text: 'const x = 1' }],
+          },
+        ],
+      },
+    });
+
+    const trigger = div.querySelector(
+      '.code-block-toolbar__lang-trigger',
+    ) as HTMLButtonElement;
+    trigger.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+
+    const menu = document.body.querySelector(
+      '.code-block-toolbar__lang-menu.is-portal',
+    ) as HTMLElement | null;
+    expect(menu).toBeTruthy();
+    expect(menu!.parentElement).toBe(document.body);
+    expect(menu!.hidden).toBe(false);
+    expect(menu!.style.position).toBe('fixed');
+
+    editor.destroy();
+    div.remove();
+    document
+      .querySelectorAll('.code-block-toolbar__lang-menu.is-portal')
+      .forEach((node) => node.remove());
   });
 
   it('changes code block language from toolbar select', () => {
@@ -207,7 +247,7 @@ describe('CodeBlockToolbar NodeView in editor', () => {
     const trigger = div.querySelector(
       '.code-block-toolbar__lang-trigger',
     ) as HTMLButtonElement;
-    expect(trigger.textContent).toBe('Plain Text');
+    expect(trigger.textContent).toBe('纯文本');
 
     editor.destroy();
     div.remove();

@@ -11,6 +11,99 @@
   max-width: 100%;
 }
 
+.umean-editor .ProseMirror a {
+  cursor: text;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* 行内代码：等宽芯片，区别于高亮 mark */
+.umean-editor .ProseMirror :not(pre) > code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.9em;
+  padding: 0.15em 0.4em;
+  border-radius: 0.3em;
+  background: rgba(148, 163, 184, 0.18);
+  color: inherit;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+/* 高亮：荧光笔感，不做等宽 */
+.umean-editor .ProseMirror mark,
+.umean-editor .ProseMirror .umean-highlight {
+  background: rgba(250, 204, 21, 0.45);
+  color: inherit;
+  border-radius: 0.15em;
+  padding: 0.05em 0.15em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* 引用：左色条，轻量区隔正文 */
+.umean-editor .ProseMirror blockquote {
+  margin: 0.75rem 0;
+  padding: 0.35rem 0 0.35rem 1rem;
+  border-left: 3px solid #94a3b8;
+  color: #64748b;
+}
+
+.umean-editor .ProseMirror blockquote p {
+  margin: 0.35rem 0;
+}
+
+/* Callout 提示块 */
+.umean-editor .ProseMirror .umean-callout {
+  margin: 0.85rem 0;
+  padding: 0.65rem 0.85rem 0.65rem 0.9rem;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  border-left-width: 4px;
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.umean-editor .ProseMirror .umean-callout::before {
+  content: attr(data-callout-label);
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.umean-editor .ProseMirror .umean-callout > *:first-child {
+  margin-top: 0;
+}
+
+.umean-editor .ProseMirror .umean-callout > *:last-child {
+  margin-bottom: 0;
+}
+
+.umean-editor .ProseMirror .umean-callout--info {
+  border-left-color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.25);
+  background: rgba(56, 189, 248, 0.08);
+}
+
+.umean-editor .ProseMirror .umean-callout--tip {
+  border-left-color: #34d399;
+  border-color: rgba(52, 211, 153, 0.25);
+  background: rgba(52, 211, 153, 0.08);
+}
+
+.umean-editor .ProseMirror .umean-callout--warning {
+  border-left-color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.28);
+  background: rgba(251, 191, 36, 0.1);
+}
+
+.umean-editor .ProseMirror .umean-callout--danger {
+  border-left-color: #f87171;
+  border-color: rgba(248, 113, 113, 0.28);
+  background: rgba(248, 113, 113, 0.1);
+}
+
 .umean-editor .ProseMirror ul[data-type='taskList'] {
   list-style: none;
   padding: 0;
@@ -302,7 +395,7 @@
   z-index: 50;
   min-width: 100%;
   max-width: 14rem;
-  max-height: 16rem;
+  max-height: min(16rem, calc(100vh - 16px));
   margin: 0;
   padding: 0.25rem;
   list-style: none;
@@ -311,6 +404,54 @@
   background: var(--umean-panel-toolbar-bg);
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.45);
   overflow: auto;
+}
+
+/* portal 到 body：逃逸 nodeview overflow，并允许翻转到触发器上方 */
+.code-block-toolbar__lang-menu.is-portal {
+  --umean-panel-border: #334155;
+  --umean-panel-toolbar-bg: #172033;
+  --umean-panel-button-hover-bg: #334155;
+  --umean-panel-button-hover-color: #e2e8f0;
+  --umean-panel-button-active-bg: #1e293b;
+  --umean-panel-button-active-color: #f1f5f9;
+
+  position: fixed;
+  top: auto;
+  left: auto;
+  z-index: 1000;
+  min-width: 8rem;
+  max-width: 14rem;
+  max-height: min(16rem, calc(100vh - 16px));
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  border: 1px solid var(--umean-panel-border);
+  border-radius: 0.5rem;
+  background: var(--umean-panel-toolbar-bg);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.45);
+  overflow: auto;
+}
+
+.code-block-toolbar__lang-menu.is-portal .code-block-toolbar__lang-option {
+  border-radius: 0.375rem;
+  color: var(--umean-panel-button-hover-color);
+  cursor: pointer;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  padding: 0.375rem 0.625rem;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.code-block-toolbar__lang-menu.is-portal .code-block-toolbar__lang-option:hover {
+  background: var(--umean-panel-button-hover-bg);
+  color: var(--umean-panel-button-hover-color);
+}
+
+.code-block-toolbar__lang-menu.is-portal .code-block-toolbar__lang-option.is-active {
+  background: var(--umean-panel-button-active-bg);
+  color: var(--umean-panel-button-active-color);
+  font-weight: 600;
 }
 
 .umean-editor .ProseMirror .code-block-toolbar__lang-option {
@@ -380,4 +521,49 @@
   float: left;
   height: 0;
   pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Slash 命令菜单（portal 到 body，选择器不依赖 .umean-editor 祖先）
+   -------------------------------------------------------------------------- */
+.umean-slash {
+  box-sizing: border-box;
+  max-height: min(280px, calc(100vh - 16px));
+  min-width: 220px;
+  max-width: min(320px, calc(100vw - 24px));
+  overflow-y: auto;
+  padding: 0.35rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+}
+
+.umean-slash-group {
+  padding: 0.35rem 0.5rem 0.2rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.umean-slash-item {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.45rem 0.6rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #0f172a;
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.umean-slash-item:hover,
+.umean-slash-item.is-active {
+  background: #e2e8f0;
 }

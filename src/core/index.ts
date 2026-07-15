@@ -6,6 +6,24 @@ export {
   type BlockMathNodeViewOptions,
 } from './extensions/blockMathNodeView';
 export { HeadingPolicy } from './extensions/headingPolicy';
+export {
+  ZH_CN,
+  EN,
+  resolveMessages,
+  type UmeanMessages,
+} from './i18n';
+export {
+  Callout,
+  CALLOUT_TYPES,
+  CALLOUT_TYPE_LABELS,
+  type CalloutType,
+  type CalloutOptions,
+} from './extensions/callout';
+export {
+  LinkExit,
+  exitLinkStoredMark,
+  isAtEndOfLink,
+} from './extensions/linkExit';
 export { InlineMathUnwrap, inlineMathToEditableText } from './extensions/inlineMathUnwrap';
 export { MarkdownClipboard } from './extensions/markdownClipboard';
 export {
@@ -47,6 +65,68 @@ export {
   type CodeBlockLanguageConfig,
   type ResolvedCodeBlockLanguage,
 } from './utils/codeBlockLanguages';
+export {
+  DEFAULT_LINK_OPTIONS,
+  resolveStarterKitLink,
+} from './utils/linkDefaults';
+export {
+  EDITOR_ACTION_IDS,
+  type EditorActionId,
+  type EditorActionPayload,
+  type EditorActionPayloadMap,
+  type KeyboardShortcutBinding,
+  type KeyboardShortcutHandler,
+  type KeyboardShortcutsOptions,
+} from './commands/types';
+export {
+  DEFAULT_SHORTCUT_BINDINGS,
+  resolveShortcutBindings,
+} from './commands/defaultShortcuts';
+export {
+  runEditorAction,
+  canRunEditorAction,
+  isEditorActionActive,
+} from './commands/runAction';
+export { KeyboardShortcuts } from './extensions/keyboardShortcuts';
+export { MediaUpload } from './extensions/mediaUpload';
+export {
+  pickLocalFile,
+  isImageFile,
+  collectFilesFromDataTransfer,
+  normalizeImageUploadResult,
+  normalizeFileUploadResult,
+  type UploadSource,
+  type UploadContext,
+  type ImageUploadResult,
+  type FileUploadResult,
+  type MediaUploadOptions,
+} from './media/uploadTypes';
+export { resolveSlashOptions } from './media/resolveSlashUpload';
+export {
+  computeFloatingMenuPosition,
+  positionFloatingMenu,
+} from './utils/floatingMenuPosition';
+export {
+  SlashCommand,
+  slashPluginKey,
+  findSlashMatch,
+  computeSlashMenuPosition,
+} from './extensions/slashCommand';
+export {
+  DEFAULT_SLASH_ITEMS,
+  buildDefaultSlashItems,
+  getDefaultSlashItems,
+  resolveSlashItems,
+  filterSlashItems,
+} from './commands/slashItems';
+export type {
+  SlashItem,
+  SlashItemGroup,
+  SlashMatch,
+  SlashState,
+  SlashRequestContext,
+  SlashCommandOptions,
+} from './commands/slashTypes';
 
 export {
   DEFAULT_PLACEHOLDER_CONTENT,

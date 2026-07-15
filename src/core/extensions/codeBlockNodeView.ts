@@ -1,13 +1,16 @@
 import { Extension } from '@tiptap/core';
-import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state';
+import { Plugin, PluginKey } from '@tiptap/pm/state';
 import type { EditorView, NodeView, ViewMutationRecord } from '@tiptap/pm/view';
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 
+import { ZH_CN, type UmeanMessages } from '../i18n';
 import {
   findResolvedCodeBlockLanguage,
   resolveCodeBlockLanguageId,
   type ResolvedCodeBlockLanguage,
 } from '../utils/codeBlockLanguages';
+import { copyToClipboard, focusProseMirrorNodeEnd } from '../utils/clipboard';
+import { positionFloatingMenu } from '../utils/floatingMenuPosition';
 import {
   MermaidNodeView,
   type MermaidCodeBlockOptions,
@@ -29,6 +32,8 @@ export interface CodeBlockToolbarOptions {
   languages?: ResolvedCodeBlockLanguage[];
   /** 语言别名 → 规范 id 映射 */
   aliasToId?: ReadonlyMap<string, string>;
+  /** 国际化文案，默认 zh-CN */
+  messages?: UmeanMessages;
 }
 
 const codeBlockToolbarPluginKey = new PluginKey('codeBlockToolbar');
@@ -163,7 +168,8 @@ export class CodeBlockToolbarNodeView implements NodeView {
   private languageMenuOpen = false;
   private documentClickHandler?: (event: MouseEvent) => void;
   destroyed = false;
-  private copyResetTimer: ReturnType<typeof setTimeout> | undefined;
+  private messages: UmeanMessages;
+  private copyResetTimer: { current: ReturnType<typeof setTimeout> | undefined } = { current: undefined };
 
   constructor(
     node: ProseMirrorNode,
@@ -171,12 +177,14 @@ export class CodeBlockToolbarNodeView implements NodeView {
     getPos: () => number | undefined,
     languages: ResolvedCodeBlockLanguage[],
     aliasToId: ReadonlyMap<string, string>,
+    messages: UmeanMessages = ZH_CN,
   ) {
     this.node = node;
     this.view = view;
     this.getPos = getPos;
     this.languages = languages;
     this.aliasToId = aliasToId;
+    this.messages = messages;
 
     this.dom = document.createElement('div');
     this.dom.className = 'code-block-nodeview';
@@ -191,7 +199,7 @@ export class CodeBlockToolbarNodeView implements NodeView {
     this.languageTrigger = document.createElement('button');
     this.languageTrigger.type = 'button';
     this.languageTrigger.className = 'code-block-toolbar__lang-trigger';
-    this.languageTrigger.setAttribute('aria-label', '代码块语言');
+    this.languageTrigger.setAttribute('aria-label', this.messages.codeBlockLanguage);
     this.languageTrigger.setAttribute('aria-haspopup', 'listbox');
     this.languageTrigger.setAttribute('aria-expanded', 'false');
 
@@ -210,16 +218,21 @@ export class CodeBlockToolbarNodeView implements NodeView {
     this.syncLanguagePicker(node.attrs.language);
 
     this.documentClickHandler = (event) => {
-      if (!this.languagePicker.contains(event.target as Node)) {
-        this.closeLanguageMenu();
+      const target = event.target as Node;
+      if (
+        this.languagePicker.contains(target) ||
+        this.languageMenu.contains(target)
+      ) {
+        return;
       }
+      this.closeLanguageMenu();
     };
     document.addEventListener('mousedown', this.documentClickHandler);
 
     this.copyButton = document.createElement('button');
     this.copyButton.type = 'button';
     this.copyButton.className = 'code-block-toolbar__button';
-    this.copyButton.textContent = '复制';
+    this.copyButton.textContent = this.messages.copy;
     this.copyButton.addEventListener('mousedown', (event) => {
       event.preventDefault();
       void this.copySource();
@@ -262,7 +275,9 @@ export class CodeBlockToolbarNodeView implements NodeView {
 
   stopEvent(event: Event): boolean {
     const target = event.target as Node;
-    return this.toolbar.contains(target);
+    return (
+      this.toolbar.contains(target) || this.languageMenu.contains(target)
+    );
   }
 
   destroy(): void {
@@ -271,14 +286,14 @@ export class CodeBlockToolbarNodeView implements NodeView {
     if (this.documentClickHandler) {
       document.removeEventListener('mousedown', this.documentClickHandler);
     }
-    if (this.copyResetTimer) {
-      clearTimeout(this.copyResetTimer);
+    if (this.copyResetTimer.current) {
+      clearTimeout(this.copyResetTimer.current);
     }
   }
 
   private getLanguageLabel(languageId: string): string {
     if (languageId === 'text') {
-      return 'Plain Text';
+      return this.messages.codeBlockPlainText;
     }
 
     const resolved = findResolvedCodeBlockLanguage(this.languages, languageId);
@@ -290,7 +305,7 @@ export class CodeBlockToolbarNodeView implements NodeView {
   ): Array<{ id: string; label: string }> {
     const selected = normalizeLanguage(currentLanguage, this.aliasToId);
     const items: Array<{ id: string; label: string }> = [
-      { id: 'text', label: 'Plain Text' },
+      { id: 'text', label: this.messages.codeBlockPlainText },
       ...this.languages.map((language) => ({
         id: language.id,
         label: language.label,
@@ -338,6 +353,10 @@ export class CodeBlockToolbarNodeView implements NodeView {
 
       this.languageMenu.appendChild(option);
     }
+
+    if (this.languageMenuOpen) {
+      this.positionLanguageMenu();
+    }
   }
 
   private toggleLanguageMenu(): void {
@@ -346,11 +365,49 @@ export class CodeBlockToolbarNodeView implements NodeView {
       return;
     }
 
+    this.openLanguageMenu();
+  }
+
+  private openLanguageMenu(): void {
     this.languageMenuOpen = true;
     this.languageMenu.hidden = false;
+    this.languageMenu.classList.add('is-portal');
     this.languagePicker.classList.add('is-open');
     this.dom.classList.add('is-lang-open');
     this.languageTrigger.setAttribute('aria-expanded', 'true');
+    this.copyPanelCssVariables(this.languageMenu);
+    document.body.appendChild(this.languageMenu);
+    this.positionLanguageMenu();
+  }
+
+  private positionLanguageMenu(): void {
+    if (!this.languageMenuOpen) {
+      return;
+    }
+
+    positionFloatingMenu(
+      this.languageMenu,
+      this.languageTrigger.getBoundingClientRect(),
+    );
+  }
+
+  private copyPanelCssVariables(target: HTMLElement): void {
+    const source = getComputedStyle(this.dom);
+    const keys = [
+      '--umean-panel-border',
+      '--umean-panel-toolbar-bg',
+      '--umean-panel-button-hover-bg',
+      '--umean-panel-button-hover-color',
+      '--umean-panel-button-active-bg',
+      '--umean-panel-button-active-color',
+    ];
+
+    for (const key of keys) {
+      const value = source.getPropertyValue(key).trim();
+      if (value) {
+        target.style.setProperty(key, value);
+      }
+    }
   }
 
   private closeLanguageMenu(): void {
@@ -360,9 +417,19 @@ export class CodeBlockToolbarNodeView implements NodeView {
 
     this.languageMenuOpen = false;
     this.languageMenu.hidden = true;
+    this.languageMenu.classList.remove('is-portal');
+    this.languageMenu.style.position = '';
+    this.languageMenu.style.left = '';
+    this.languageMenu.style.top = '';
+    this.languageMenu.style.zIndex = '';
+    this.languageMenu.style.visibility = '';
     this.languagePicker.classList.remove('is-open');
     this.dom.classList.remove('is-lang-open');
     this.languageTrigger.setAttribute('aria-expanded', 'false');
+
+    if (this.languageMenu.parentElement !== this.languagePicker) {
+      this.languagePicker.appendChild(this.languageMenu);
+    }
   }
 
   private syncLanguageClass(language: string | null | undefined): void {
@@ -394,55 +461,19 @@ export class CodeBlockToolbarNodeView implements NodeView {
   }
 
   private focusSource(): void {
-    const pos = this.getPos();
-    if (pos == null) return;
-
-    const { doc } = this.view.state;
-    const innerFrom = pos + 1;
-    const innerTo = pos + this.node.nodeSize - 1;
-    const selection =
-      innerTo > innerFrom
-        ? TextSelection.create(doc, innerTo)
-        : TextSelection.near(doc.resolve(innerFrom));
-
-    this.view.dispatch(this.view.state.tr.setSelection(selection));
-    this.view.focus();
+    focusProseMirrorNodeEnd(this.view, this.node, this.getPos);
   }
 
   private async copySource(): Promise<void> {
-    const text = this.node.textContent;
-
-    try {
-      await navigator.clipboard.writeText(text);
-      this.copyButton.textContent = '已复制';
-    } catch {
-      this.copyButton.textContent = '复制失败';
-    }
-
-    if (this.copyResetTimer) {
-      clearTimeout(this.copyResetTimer);
-    }
-
-    this.copyResetTimer = setTimeout(() => {
-      this.copyButton.textContent = '复制';
-    }, 2000);
-
-    this.focusSource();
+    await copyToClipboard(
+      this.node.textContent,
+      this.copyButton,
+      this.messages,
+      this.copyResetTimer,
+      () => this.focusSource(),
+    );
   }
 }
-
-let toolbarOptions: Required<Pick<CodeBlockToolbarOptions, 'enabled'>> & {
-  toolbar: { enabled: boolean };
-  mermaid: { enabled: boolean; theme: MermaidCodeBlockOptions['theme'] };
-  languages: ResolvedCodeBlockLanguage[];
-  aliasToId: ReadonlyMap<string, string>;
-} = {
-  enabled: true,
-  toolbar: { enabled: true },
-  mermaid: { enabled: true, theme: 'dark' },
-  languages: [],
-  aliasToId: new Map(),
-};
 
 export const CodeBlockEnter = Extension.create({
   name: 'codeBlockEnter',
@@ -470,11 +501,12 @@ export const CodeBlockToolbar = Extension.create<CodeBlockToolbarOptions>({
       },
       languages: [],
       aliasToId: new Map<string, string>(),
+      messages: ZH_CN,
     };
   },
 
   addProseMirrorPlugins() {
-    toolbarOptions = {
+    const opts = {
       enabled: this.options.enabled ?? true,
       toolbar: {
         enabled: this.options.toolbar?.enabled ?? true,
@@ -484,13 +516,14 @@ export const CodeBlockToolbar = Extension.create<CodeBlockToolbarOptions>({
         theme: this.options.mermaid?.theme ?? 'dark',
       },
       languages: this.options.languages ?? [],
-      aliasToId: this.options.aliasToId ?? new Map(),
+      aliasToId: this.options.aliasToId ?? new Map<string, string>(),
+      messages: this.options.messages ?? ZH_CN,
     };
 
-    if (!toolbarOptions.enabled) return [];
-    if (!toolbarOptions.toolbar.enabled && !toolbarOptions.mermaid.enabled) return [];
+    if (!opts.enabled) return [];
+    if (!opts.toolbar.enabled && !opts.mermaid.enabled) return [];
 
-    const { languages, aliasToId } = toolbarOptions;
+    const { languages, aliasToId, messages } = opts;
 
     return [
       new Plugin({
@@ -500,18 +533,19 @@ export const CodeBlockToolbar = Extension.create<CodeBlockToolbarOptions>({
           nodeViews: {
             codeBlock: ((node: ProseMirrorNode, view: EditorView, getPos: () => number | undefined) => {
               if (node.attrs.language === 'mermaid') {
-                if (!toolbarOptions.mermaid.enabled) {
-                  if (!toolbarOptions.toolbar.enabled) return undefined;
-                  return new CodeBlockToolbarNodeView(node, view, getPos, languages, aliasToId);
+                if (!opts.mermaid.enabled) {
+                  if (!opts.toolbar.enabled) return undefined;
+                  return new CodeBlockToolbarNodeView(node, view, getPos, languages, aliasToId, messages);
                 }
 
                 return new MermaidNodeView(node, view, getPos, {
-                  theme: toolbarOptions.mermaid.theme,
+                  theme: opts.mermaid.theme,
+                  messages,
                 });
               }
 
-              if (!toolbarOptions.toolbar.enabled) return undefined;
-              return new CodeBlockToolbarNodeView(node, view, getPos, languages, aliasToId);
+              if (!opts.toolbar.enabled) return undefined;
+              return new CodeBlockToolbarNodeView(node, view, getPos, languages, aliasToId, messages);
             }) as any,
           },
         },
@@ -519,8 +553,3 @@ export const CodeBlockToolbar = Extension.create<CodeBlockToolbarOptions>({
     ];
   },
 });
-
-/** @internal 测试用：读取当前工具栏配置 */
-export function getCodeBlockToolbarOptionsForTests() {
-  return toolbarOptions;
-}

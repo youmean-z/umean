@@ -96,4 +96,22 @@ describe('transform round-trips', () => {
     const html = jsonToHTML(original);
     expect(html).toContain('Hello World');
   });
+
+  it('markdown links round-trip to JSON with link mark', () => {
+    const json = markdownToJSON('见 [文档](https://example.com/docs)');
+    const paragraph = json.content?.find((node) => node.type === 'paragraph');
+    const linked = paragraph?.content?.find(
+      (node) =>
+        node.type === 'text' &&
+        Array.isArray(node.marks) &&
+        node.marks.some((mark) => mark.type === 'link'),
+    );
+
+    expect(linked?.text).toBe('文档');
+    const linkMark = linked?.marks?.find((mark) => mark.type === 'link');
+    expect(linkMark?.attrs?.href).toBe('https://example.com/docs');
+
+    const md = jsonToMarkdown(json);
+    expect(md).toContain('[文档](https://example.com/docs)');
+  });
 });

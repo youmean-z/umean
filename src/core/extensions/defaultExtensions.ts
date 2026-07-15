@@ -4,19 +4,22 @@ import StarterKit from '@tiptap/starter-kit';
 
 import type { StarterKitOptions } from '@tiptap/starter-kit';
 
+import { resolveMessages } from '../i18n';
 import type {
   DefaultExtensionsOptions,
   HeadingPolicyMode,
   HeadingPolicyOptions,
 } from '../types';
-import {
-  DEFAULT_PLACEHOLDER_CONTENT,
-  DEFAULT_PLACEHOLDER_TITLE,
-} from '../types';
+import { resolveStarterKitLink } from '../utils/linkDefaults';
+import { resolveSlashOptions } from '../media/resolveSlashUpload';
 import { createEditorPlaceholder } from './editorPlaceholder';
 import { HeadingPolicy } from './headingPolicy';
+import { KeyboardShortcuts } from './keyboardShortcuts';
+import { LinkExit } from './linkExit';
 import { MarkdownClipboard } from './markdownClipboard';
+import { MediaUpload } from './mediaUpload';
 import { createRichExtensions } from './richExtensions';
+import { SlashCommand } from './slashCommand';
 import { TableAlignShortcut } from './tableAlignShortcut';
 import { TableShortcut } from './tableShortcut';
 
@@ -37,12 +40,14 @@ function resolveHeadingPolicyOptions(
     return null;
   }
 
+  const messages = resolveMessages(options.locale);
+
   return {
     mode: options.headingPolicy?.mode ?? 'free',
     placeholderTitle:
-      options.headingPolicy?.placeholderTitle ?? DEFAULT_PLACEHOLDER_TITLE,
+      options.headingPolicy?.placeholderTitle ?? messages.placeholderTitle,
     placeholderContent:
-      options.headingPolicy?.placeholderContent ?? DEFAULT_PLACEHOLDER_CONTENT,
+      options.headingPolicy?.placeholderContent ?? messages.placeholderContent,
   };
 }
 
@@ -117,11 +122,13 @@ export function createDefaultExtensions(
 ): AnyExtension[] {
   const extensions: AnyExtension[] = [];
   const headingPolicyMode = resolveHeadingPolicyMode(options);
+  const messages = resolveMessages(options.locale);
 
   if (options.starterKit !== false) {
     const starterKitOptions: Partial<StarterKitOptions> = {
       codeBlock: false,
       ...options.starterKit,
+      link: resolveStarterKitLink(options),
     };
 
     if (headingPolicyMode === 'chunk') {
@@ -134,10 +141,33 @@ export function createDefaultExtensions(
     }
 
     extensions.push(StarterKit.configure(starterKitOptions));
+
+    if (starterKitOptions.link !== false) {
+      extensions.push(LinkExit);
+    }
+  }
+
+  if (options.shortcuts !== false) {
+    extensions.push(
+      options.shortcuts
+        ? KeyboardShortcuts.configure(options.shortcuts)
+        : KeyboardShortcuts,
+    );
+  }
+
+  if (options.slash !== false) {
+    const slashOptions = resolveSlashOptions(options, messages);
+    if (slashOptions !== false) {
+      extensions.push(SlashCommand.configure(slashOptions));
+    }
+  }
+
+  if (options.upload !== false && options.upload) {
+    extensions.push(MediaUpload.configure(options.upload));
   }
 
   if (options.rich !== false) {
-    extensions.push(...createRichExtensions(options.rich));
+    extensions.push(...createRichExtensions(options.rich, messages));
   }
 
   appendMarkdownExtensions(extensions, options);

@@ -99,6 +99,8 @@ describe('createRichExtensions', () => {
     const exts = createRichExtensions();
     const names = exts.map((e: any) => e.name);
     expect(names).toContain('image');
+    expect(names).toContain('highlight');
+    expect(names).toContain('callout');
     expect(names).toContain('taskList');
     expect(names).toContain('taskItem');
     expect(names).toContain('table');

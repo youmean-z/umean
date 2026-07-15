@@ -13,6 +13,35 @@
   border-radius: 8px;
 }
 
+.umean-editor .ProseMirror a {
+  color: #2563eb;
+}
+
+.umean-editor .ProseMirror a:hover {
+  color: #1d4ed8;
+}
+
+.umean-editor .ProseMirror :not(pre) > code {
+  background: rgba(51, 65, 85, 0.85);
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+.umean-editor .ProseMirror mark,
+.umean-editor .ProseMirror .umean-highlight {
+  background: rgba(250, 204, 21, 0.35);
+  color: #fef9c3;
+}
+
+.umean-editor .ProseMirror blockquote {
+  border-left-color: #64748b;
+  color: #94a3b8;
+}
+
+.umean-editor .ProseMirror .umean-callout {
+  color: #e2e8f0;
+}
+
 .umean-editor .ProseMirror table {
   margin: 0.75rem 0;
 }
@@ -37,4 +66,23 @@
 
 .umean-editor .ProseMirror pre:not(.mermaid-source):not(.code-block-source) code {
   color: inherit;
+}
+
+.umean-slash {
+  border-color: #334155;
+  background: #1e293b;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.umean-slash-group {
+  color: #64748b;
+}
+
+.umean-slash-item {
+  color: #e2e8f0;
+}
+
+.umean-slash-item:hover,
+.umean-slash-item.is-active {
+  background: #334155;
 }

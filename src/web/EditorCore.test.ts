@@ -97,4 +97,70 @@ describe('EditorCore', () => {
     core = new EditorCore({ element: container });
     expect(() => core.unmount()).toThrow(/not supported/);
   });
+
+  it('setLink / unsetLink / getLinkHref work on selection', () => {
+    core = new EditorCore({ element: container });
+    core.setMarkdown('visit docs');
+    core.editor.commands.setTextSelection({ from: 1, to: 6 });
+
+    expect(core.setLink('https://example.com')).toBe(true);
+    expect(core.isLinkActive()).toBe(true);
+    expect(core.getLinkHref()).toBe('https://example.com');
+    expect(core.getHTML()).toContain('href="https://example.com"');
+    expect(core.getHTML()).toContain('target="_blank"');
+    expect(core.getMarkdown()).toMatch(/\[visit\]\(https:\/\/example\.com\/?\)/);
+
+    expect(core.unsetLink()).toBe(true);
+    expect(core.isLinkActive()).toBe(false);
+    expect(core.getLinkHref()).toBeNull();
+  });
+
+  it('exitLink keeps existing link but stops extending it', () => {
+    core = new EditorCore({ element: container });
+    core.setMarkdown('visit');
+    core.editor.commands.setTextSelection({ from: 1, to: 6 });
+    expect(core.setLink('https://example.com')).toBe(true);
+    core.editor.commands.setTextSelection(6);
+    expect(core.exitLink()).toBe(true);
+    core.editor.commands.insertContent(' now');
+    const html = core.getHTML();
+    expect(html).toContain('>visit</a>');
+    expect(html).not.toMatch(/visit now<\/a>/);
+  });
+
+  it('run / can / isActive share action ids', () => {
+    core = new EditorCore({ element: container });
+    core.setMarkdown('hello');
+    core.editor.commands.setTextSelection({ from: 1, to: 6 });
+    expect(core.can('toggleBold')).toBe(true);
+    expect(core.run('toggleBold')).toBe(true);
+    expect(core.isActive('toggleBold')).toBe(true);
+  });
+
+  it('onSelectionUpdate receives action helpers', () => {
+    const payloads: any[] = [];
+    core = new EditorCore({
+      element: container,
+      content: 'hi',
+      contentType: 'markdown',
+      onSelectionUpdate: (p) => payloads.push(p),
+    });
+    core.editor.commands.setTextSelection({ from: 1, to: 3 });
+    expect(payloads.length).toBeGreaterThan(0);
+    const last = payloads[payloads.length - 1];
+    expect(typeof last.isActive).toBe('function');
+    expect(typeof last.can).toBe('function');
+  });
+
+  it('accepts top-level shortcuts option', () => {
+    const handler = () => true;
+    core = new EditorCore({
+      element: container,
+      shortcuts: { bindings: { 'Mod-k': handler } },
+    });
+    const ext = core.editor.extensionManager.extensions.find(
+      (e) => e.name === 'umeanKeyboardShortcuts',
+    );
+    expect(ext?.options.bindings?.['Mod-k']).toBe(handler);
+  });
 });

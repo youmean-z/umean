@@ -1,7 +1,9 @@
 import type { JSONContent } from '@tiptap/core';
 import type { EditorOptions } from '@tiptap/core';
 import type { CodeBlockLowlightOptions } from '@tiptap/extension-code-block-lowlight';
+import type { HighlightOptions } from '@tiptap/extension-highlight';
 import type { ImageOptions } from '@tiptap/extension-image';
+import type { LinkOptions } from '@tiptap/extension-link';
 import type { KatexOptions } from 'katex';
 import type { TableOptions } from '@tiptap/extension-table';
 import type { TaskItemOptions } from '@tiptap/extension-task-item';
@@ -9,7 +11,12 @@ import type { TaskListOptions } from '@tiptap/extension-task-list';
 import type { MarkdownExtensionOptions } from '@tiptap/markdown';
 import type { StarterKitOptions } from '@tiptap/starter-kit';
 
+import type { CalloutOptions } from './extensions/callout';
+import type { KeyboardShortcutsOptions } from './commands/types';
+import type { SlashCommandOptions } from './commands/slashTypes';
+import type { MediaUploadOptions } from './media/uploadTypes';
 import type { CodeBlockLanguageInput } from './utils/codeBlockLanguages';
+import type { UmeanMessages } from './i18n';
 
 export type HeadingPolicyMode = 'free' | 'document' | 'chunk';
 
@@ -40,6 +47,10 @@ export type { CodeBlockLanguageDefinition, CodeBlockLanguageInput } from './util
 
 export interface RichExtensionsOptions {
   image?: Partial<ImageOptions> | false;
+  /** 行内高亮（`<mark>` / `==文本==`），默认启用 */
+  highlight?: Partial<HighlightOptions> | false;
+  /** 提示块 Callout（`> [!info]` 等），默认启用 */
+  callout?: CalloutOptions | false;
   taskList?:
     | false
     | {
@@ -69,6 +80,32 @@ export interface RichExtensionsOptions {
 export interface DefaultExtensionsOptions {
   starterKit?: Partial<StarterKitOptions> | false;
   markdown?: Partial<MarkdownExtensionOptions>;
+  /**
+   * 链接（StarterKit Link）。默认启用：自动识别 URL、粘贴成链、编辑时不点开、外链新窗口。
+   * `false` 关闭；对象会与笔记默认值合并。也可通过 `starterKit.link` 配置。
+   */
+  link?: Partial<LinkOptions> | false;
+  /**
+   * 快捷键自定义入口。`false` 关闭 umean 统一快捷键（StarterKit 自带绑键仍可能存在）。
+   * Slash / 工具栏应优先使用同一套 `EditorActionId`。
+   */
+  shortcuts?: KeyboardShortcutsOptions | false;
+  /**
+   * Slash 命令菜单。默认启用内置 DOM 菜单；`false` 关闭。
+   * 若同时配置了 `upload.onImageUpload`，Slash「图片」会默认走文件选择 + 上传。
+   */
+  slash?: SlashCommandOptions | false;
+  /**
+   * 媒体上传钩子：粘贴 / 拖放 / Slash「图片」共用。
+   * 未配置时粘贴图片仍可能落到 Image 的 base64（若 allowBase64）。
+   */
+  upload?: MediaUploadOptions | false;
+  /**
+   * 国际化文案。默认 `zh-CN`；内置 `en`；也可传入对象覆盖部分字段。
+   * 影响 placeholder、Callout 标签、工具栏按钮、Slash 菜单等所有面向用户的字符串。
+   * 切换语言需重建编辑器（不支持运行时热切换）。
+   */
+  locale?: 'zh-CN' | 'en' | Partial<UmeanMessages>;
   /** 标题策略：free 随意 / document 笔记 / chunk 随记 */
   headingPolicy?: HeadingPolicyOptions | false;
   /** Image / TaskList / Table / CodeBlockLowlight，默认全部启用 */

@@ -1,6 +1,6 @@
 export { EditorCore } from './EditorCore';
 export { createEditor } from './createEditor';
-export type { EditorCoreOptions, EditorUpdatePayload } from './types';
+export type { EditorCoreOptions, EditorUpdatePayload, EditorSelectionPayload } from './types';
 
 export {
   createDefaultExtensions,
@@ -19,6 +19,24 @@ export {
   TableShortcut,
   Markdown,
   StarterKit,
+  EDITOR_ACTION_IDS,
+  DEFAULT_SHORTCUT_BINDINGS,
+  resolveShortcutBindings,
+  runEditorAction,
+  canRunEditorAction,
+  isEditorActionActive,
+  KeyboardShortcuts,
+  MediaUpload,
+  Callout,
+  CALLOUT_TYPES,
+  SlashCommand,
+  slashPluginKey,
+  findSlashMatch,
+  DEFAULT_SLASH_ITEMS,
+  buildDefaultSlashItems,
+  filterSlashItems,
+  pickLocalFile,
+  normalizeImageUploadResult,
 } from '../core/index';
 
 export type {
@@ -31,4 +49,21 @@ export type {
   TransformOptions,
   Editor,
   JSONContent,
+  EditorActionId,
+  EditorActionPayload,
+  EditorActionPayloadMap,
+  KeyboardShortcutBinding,
+  KeyboardShortcutHandler,
+  KeyboardShortcutsOptions,
+  SlashItem,
+  SlashCommandOptions,
+  SlashState,
+  MediaUploadOptions,
+  UploadContext,
+  UploadSource,
+  ImageUploadResult,
+  FileUploadResult,
+  CalloutType,
+  CalloutOptions,
+  UmeanMessages,
 } from '../core/index';

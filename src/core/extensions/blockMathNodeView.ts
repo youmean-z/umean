@@ -6,8 +6,13 @@ import { NodeSelection, Plugin, PluginKey } from '@tiptap/pm/state';
 import type { EditorView, NodeView, ViewMutationRecord } from '@tiptap/pm/view';
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 
+import { ZH_CN, type UmeanMessages } from '../i18n';
+import { copyToClipboard } from '../utils/clipboard';
+
 export interface BlockMathNodeViewOptions {
   katexOptions?: KatexOptions;
+  /** 国际化文案，默认 zh-CN */
+  messages?: UmeanMessages;
 }
 
 const blockMathNodeViewPluginKey = new PluginKey('blockMathNodeView');
@@ -49,20 +54,23 @@ class BlockMathNodeView implements NodeView {
   private view: EditorView;
   private getPos: () => number | undefined;
   private katexOptions: KatexOptions | undefined;
+  private messages: UmeanMessages;
   private isPreview = false;
   destroyed = false;
-  private copyResetTimer: ReturnType<typeof setTimeout> | undefined;
+  private copyResetTimer: { current: ReturnType<typeof setTimeout> | undefined } = { current: undefined };
 
   constructor(
     node: ProseMirrorNode,
     view: EditorView,
     getPos: () => number | undefined,
     katexOptions?: KatexOptions,
+    messages?: UmeanMessages,
   ) {
     this.node = node;
     this.view = view;
     this.getPos = getPos;
     this.katexOptions = katexOptions;
+    this.messages = messages ?? ZH_CN;
 
     this.dom = document.createElement('div');
     this.dom.className = 'block-math-nodeview';
@@ -77,7 +85,7 @@ class BlockMathNodeView implements NodeView {
     this.previewButton = document.createElement('button');
     this.previewButton.type = 'button';
     this.previewButton.className = 'block-math-toolbar__button';
-    this.previewButton.textContent = '公式';
+    this.previewButton.textContent = this.messages.blockMathPreview;
     this.previewButton.addEventListener('mousedown', (event) => {
       event.preventDefault();
       this.enterPreviewMode();
@@ -86,7 +94,7 @@ class BlockMathNodeView implements NodeView {
     this.sourceButton = document.createElement('button');
     this.sourceButton.type = 'button';
     this.sourceButton.className = 'block-math-toolbar__button';
-    this.sourceButton.textContent = '源码';
+    this.sourceButton.textContent = this.messages.source;
     this.sourceButton.addEventListener('mousedown', (event) => {
       event.preventDefault();
       this.enterEditMode();
@@ -95,7 +103,7 @@ class BlockMathNodeView implements NodeView {
     this.copyButton = document.createElement('button');
     this.copyButton.type = 'button';
     this.copyButton.className = 'block-math-toolbar__button block-math-toolbar__copy';
-    this.copyButton.textContent = '复制';
+    this.copyButton.textContent = this.messages.copy;
     this.copyButton.addEventListener('mousedown', (event) => {
       event.preventDefault();
       void this.copySource();
@@ -108,7 +116,7 @@ class BlockMathNodeView implements NodeView {
     this.sourceArea = document.createElement('textarea');
     this.sourceArea.className = 'block-math-source';
     this.sourceArea.spellcheck = false;
-    this.sourceArea.placeholder = '多行公式用 \\\\ 换行，例如：E=mc^2 \\\\ \\sum_{i=1}^{n} i';
+    this.sourceArea.placeholder = this.messages.blockMathPlaceholder;
     this.sourceArea.value = node.attrs.latex ?? '';
     this.sourceArea.addEventListener('input', () => {
       this.resizeSourceArea();
@@ -166,8 +174,8 @@ class BlockMathNodeView implements NodeView {
   destroy(): void {
     this.destroyed = true;
     activeBlockMathNodeViews.delete(this);
-    if (this.copyResetTimer) {
-      clearTimeout(this.copyResetTimer);
+    if (this.copyResetTimer.current) {
+      clearTimeout(this.copyResetTimer.current);
     }
   }
 
@@ -221,7 +229,7 @@ class BlockMathNodeView implements NodeView {
     this.previewDom.innerHTML = '';
 
     if (!latex.trim()) {
-      this.previewDom.textContent = '(公式源码为空)';
+      this.previewDom.textContent = this.messages.blockMathEmpty;
       return;
     }
 
@@ -232,7 +240,7 @@ class BlockMathNodeView implements NodeView {
         ...this.katexOptions,
       });
     } catch {
-      this.previewDom.textContent = `(公式解析错误)\n${latex}`;
+      this.previewDom.textContent = `${this.messages.blockMathError}\n${latex}`;
     }
   }
 
@@ -248,24 +256,13 @@ class BlockMathNodeView implements NodeView {
   }
 
   private async copySource(): Promise<void> {
-    const text = String(this.node.attrs.latex ?? '');
-
-    try {
-      await navigator.clipboard.writeText(text);
-      this.copyButton.textContent = '已复制';
-    } catch {
-      this.copyButton.textContent = '复制失败';
-    }
-
-    if (this.copyResetTimer) {
-      clearTimeout(this.copyResetTimer);
-    }
-
-    this.copyResetTimer = setTimeout(() => {
-      this.copyButton.textContent = '复制';
-    }, 2000);
-
-    this.focusSource();
+    await copyToClipboard(
+      String(this.node.attrs.latex ?? ''),
+      this.copyButton,
+      this.messages,
+      this.copyResetTimer,
+      () => this.focusSource(),
+    );
   }
 
   private resizeSourceArea(): void {
@@ -287,10 +284,10 @@ function enterEditModeForBlockMathAt(view: EditorView, pos: number): boolean {
 /** 覆盖默认 BlockMath NodeView，并追加 $$$ + 空格快捷输入与 Backspace 进编辑 */
 export const BlockMathWithNodeView = BlockMath.extend<BlockMathNodeViewOptions>({
   addNodeView() {
-    const { katexOptions } = this.options;
+    const { katexOptions, messages } = this.options;
 
     return ({ node, view, getPos }) =>
-      new BlockMathNodeView(node, view, getPos, katexOptions);
+      new BlockMathNodeView(node, view, getPos, katexOptions, messages);
   },
 
   addInputRules() {
