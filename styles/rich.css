@@ -95,3 +95,14 @@
 .umean-slash-item.is-active {
   background: #334155;
 }
+
+.umean-editor .ProseMirror .umean-find-match {
+  background: #854d0e;
+  color: #fef3c7;
+}
+
+.umean-editor .ProseMirror .umean-find-match.is-current {
+  background: #f59e0b;
+  color: #1c1917;
+  box-shadow: 0 0 0 1px rgba(253, 230, 138, 0.5);
+}

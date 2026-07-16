@@ -12,6 +12,7 @@ import type { MarkdownExtensionOptions } from '@tiptap/markdown';
 import type { StarterKitOptions } from '@tiptap/starter-kit';
 
 import type { CalloutOptions } from './extensions/callout';
+import type { FindReplaceOptions } from './extensions/findReplace';
 import type { KeyboardShortcutsOptions } from './commands/types';
 import type { SlashCommandOptions } from './commands/slashTypes';
 import type { MediaUploadOptions } from './media/uploadTypes';
@@ -108,6 +109,11 @@ export interface DefaultExtensionsOptions {
   locale?: 'zh-CN' | 'en' | Partial<UmeanMessages>;
   /** 标题策略：free 随意 / document 笔记 / chunk 随记 */
   headingPolicy?: HeadingPolicyOptions | false;
+  /**
+   * 搜索替换。默认启用；`false` 关闭。
+   * 宿主通过 `editor.commands.setFindQuery` 等命令驱动，不内置面板 UI。
+   */
+  findReplace?: FindReplaceOptions | false;
   /** Image / TaskList / Table / CodeBlockLowlight，默认全部启用 */
   rich?: RichExtensionsOptions | false;
 }

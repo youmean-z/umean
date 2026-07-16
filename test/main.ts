@@ -1,10 +1,24 @@
 import go from 'highlight.js/lib/languages/go';
-import { createEditor, type HeadingPolicyMode } from '../src/web/index.ts';
+import {
+  createEditor,
+  getFindReplaceState,
+  type HeadingPolicyMode,
+} from '../src/web/index.ts';
 
 const editorEl = document.querySelector('#editor');
 const jsonOutputEl = document.querySelector('#json-output');
 const htmlOutputEl = document.querySelector('#html-output');
 const markdownOutputEl = document.querySelector('#markdown-output');
+
+const findQueryEl = document.querySelector('#find-query') as HTMLInputElement | null;
+const findReplaceEl = document.querySelector('#find-replace') as HTMLInputElement | null;
+const findCaseEl = document.querySelector('#find-case') as HTMLInputElement | null;
+const findStatusEl = document.querySelector('#find-status');
+const findPrevBtn = document.querySelector('#find-prev');
+const findNextBtn = document.querySelector('#find-next');
+const findReplaceOneBtn = document.querySelector('#find-replace-one');
+const findReplaceAllBtn = document.querySelector('#find-replace-all');
+const findClearBtn = document.querySelector('#find-clear');
 
 /** 公式 + Mermaid 流程图 demo 初始内容 */
 const DEMO_MARKDOWN = `# 公式与流程图测试
@@ -144,6 +158,85 @@ if (htmlOutputEl) {
 if (markdownOutputEl) {
   markdownOutputEl.textContent = core.getMarkdown();
 }
+
+function updateFindStatus(): void {
+  if (!findStatusEl) {
+    return;
+  }
+  const state = getFindReplaceState(core.editor);
+  if (!state?.query) {
+    findStatusEl.textContent = '未搜索';
+    return;
+  }
+  if (state.matches.length === 0) {
+    findStatusEl.textContent = '无匹配';
+    return;
+  }
+  findStatusEl.textContent = `${state.activeIndex + 1} / ${state.matches.length}`;
+}
+
+function runFindQuery(): void {
+  const query = findQueryEl?.value ?? '';
+  if (!query) {
+    core.editor.commands.clearFind();
+    updateFindStatus();
+    return;
+  }
+  core.editor.commands.setFindQuery(query, {
+    caseSensitive: !!findCaseEl?.checked,
+    // 输入时只更新高亮，不抢焦点、不改选区
+    select: false,
+    focus: false,
+  });
+  updateFindStatus();
+}
+
+findQueryEl?.addEventListener('input', runFindQuery);
+findCaseEl?.addEventListener('change', runFindQuery);
+
+findQueryEl?.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    if (event.shiftKey) {
+      core.editor.commands.findPrevious();
+    } else {
+      core.editor.commands.findNext();
+    }
+    updateFindStatus();
+  } else if (event.key === 'Escape') {
+    core.editor.commands.clearFind();
+    findQueryEl.value = '';
+    updateFindStatus();
+  }
+});
+
+findPrevBtn?.addEventListener('click', () => {
+  core.editor.commands.findPrevious();
+  updateFindStatus();
+});
+
+findNextBtn?.addEventListener('click', () => {
+  core.editor.commands.findNext();
+  updateFindStatus();
+});
+
+findReplaceOneBtn?.addEventListener('click', () => {
+  core.editor.commands.replaceCurrent(findReplaceEl?.value ?? '');
+  updateFindStatus();
+});
+
+findReplaceAllBtn?.addEventListener('click', () => {
+  core.editor.commands.replaceAll(findReplaceEl?.value ?? '');
+  updateFindStatus();
+});
+
+findClearBtn?.addEventListener('click', () => {
+  core.editor.commands.clearFind();
+  if (findQueryEl) {
+    findQueryEl.value = '';
+  }
+  updateFindStatus();
+});
 
 // 方便控制台调试：core.setMarkdown(...)、core.editor.commands.insertInlineMath(...)
 (window as unknown as { core: typeof core }).core = core;

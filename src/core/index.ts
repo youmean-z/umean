@@ -7,6 +7,16 @@ export {
 } from './extensions/blockMathNodeView';
 export { HeadingPolicy } from './extensions/headingPolicy';
 export {
+  FindReplace,
+  findReplacePluginKey,
+  getFindReplaceState,
+  collectFindMatches,
+  type FindMatch,
+  type FindReplacePluginState,
+  type FindReplaceOptions,
+  type SetFindQueryOptions,
+} from './extensions/findReplace';
+export {
   ZH_CN,
   EN,
   resolveMessages,

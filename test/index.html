@@ -126,6 +126,64 @@
       #markdown-output {
         color: #38bdf8;
       }
+
+      .find-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.6rem 0.85rem;
+        border-bottom: 1px solid #334155;
+        background: #172033;
+      }
+
+      .find-bar input {
+        min-width: 8rem;
+        flex: 1 1 8rem;
+        max-width: 14rem;
+        padding: 0.35rem 0.55rem;
+        border: 1px solid #475569;
+        border-radius: 6px;
+        background: #0f172a;
+        color: #e2e8f0;
+        font: inherit;
+        font-size: 0.85rem;
+      }
+
+      .find-bar input:focus {
+        outline: 1px solid #64748b;
+      }
+
+      .find-bar button {
+        padding: 0.35rem 0.6rem;
+        border: 1px solid #475569;
+        border-radius: 6px;
+        background: #1e293b;
+        color: #e2e8f0;
+        font: inherit;
+        font-size: 0.8rem;
+        cursor: pointer;
+      }
+
+      .find-bar button:hover {
+        background: #334155;
+      }
+
+      .find-bar label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.8rem;
+        color: #94a3b8;
+        user-select: none;
+      }
+
+      .find-bar .find-status {
+        margin-left: auto;
+        font-size: 0.8rem;
+        color: #94a3b8;
+        white-space: nowrap;
+      }
     </style>
   </head>
   <body>
@@ -134,6 +192,17 @@
     <div class="layout">      
       <div class="panel">
         <div class="panel-header">编辑器</div>
+        <div class="find-bar" id="find-bar">
+          <input id="find-query" type="search" placeholder="查找…" autocomplete="off" />
+          <input id="find-replace" type="text" placeholder="替换为…" autocomplete="off" />
+          <label><input id="find-case" type="checkbox" /> 区分大小写</label>
+          <button type="button" id="find-prev" title="上一处">↑</button>
+          <button type="button" id="find-next" title="下一处">↓</button>
+          <button type="button" id="find-replace-one">替换</button>
+          <button type="button" id="find-replace-all">全部替换</button>
+          <button type="button" id="find-clear">清除</button>
+          <span class="find-status" id="find-status">未搜索</span>
+        </div>
         <div id="editor" class="umean-editor"></div>
       </div>
       <div class="panel">

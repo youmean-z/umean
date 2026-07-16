@@ -13,6 +13,7 @@ import type {
 import { resolveStarterKitLink } from '../utils/linkDefaults';
 import { resolveSlashOptions } from '../media/resolveSlashUpload';
 import { createEditorPlaceholder } from './editorPlaceholder';
+import { FindReplace } from './findReplace';
 import { HeadingPolicy } from './headingPolicy';
 import { KeyboardShortcuts } from './keyboardShortcuts';
 import { LinkExit } from './linkExit';
@@ -112,6 +113,14 @@ export function createTenTapSupplementalExtensions(
     extensions.push(TableShortcut, TableAlignShortcut);
   }
 
+  if (options.findReplace !== false) {
+    extensions.push(
+      options.findReplace
+        ? FindReplace.configure(options.findReplace)
+        : FindReplace,
+    );
+  }
+
   appendPolicyExtensions(extensions, options);
 
   return extensions;
@@ -152,6 +161,14 @@ export function createDefaultExtensions(
       options.shortcuts
         ? KeyboardShortcuts.configure(options.shortcuts)
         : KeyboardShortcuts,
+    );
+  }
+
+  if (options.findReplace !== false) {
+    extensions.push(
+      options.findReplace
+        ? FindReplace.configure(options.findReplace)
+        : FindReplace,
     );
   }
 
