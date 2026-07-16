@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { Editor } from '@tiptap/core';
 
-import { filterSlashItems } from '../commands/slashItems';
+import { filterSlashItems, getDefaultSlashItems } from '../commands/slashItems';
 import { createDefaultExtensions } from './defaultExtensions';
 import { findSlashMatch, slashPluginKey } from './slashCommand';
 
@@ -140,6 +140,48 @@ describe('SlashCommand', () => {
     expect(menu!.style.display).not.toBe('none');
     expect(menu!.querySelectorAll('.umean-slash-item').length).toBeGreaterThan(0);
     expect(menu!.parentElement).toBe(document.body);
+  });
+});
+
+describe('getDefaultSlashItems headingPolicy', () => {
+  it('hides h1 in document mode', () => {
+    const element = document.createElement('div');
+    document.body.appendChild(element);
+    const editor = new Editor({
+      element,
+      extensions: createDefaultExtensions({
+        headingPolicy: { mode: 'document' },
+      }),
+      content: 'hello',
+      contentType: 'markdown',
+    });
+
+    const ids = getDefaultSlashItems(editor).map((item) => item.id);
+    expect(ids).not.toContain('toggleHeading1');
+    expect(ids).toContain('toggleHeading2');
+
+    editor.destroy();
+    element.remove();
+  });
+
+  it('hides h1 in chunk mode', () => {
+    const element = document.createElement('div');
+    document.body.appendChild(element);
+    const editor = new Editor({
+      element,
+      extensions: createDefaultExtensions({
+        headingPolicy: { mode: 'chunk' },
+      }),
+      content: 'hello',
+      contentType: 'markdown',
+    });
+
+    const ids = getDefaultSlashItems(editor).map((item) => item.id);
+    expect(ids).not.toContain('toggleHeading1');
+    expect(ids).toContain('toggleHeading2');
+
+    editor.destroy();
+    element.remove();
   });
 });
 

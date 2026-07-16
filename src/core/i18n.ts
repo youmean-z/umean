@@ -38,6 +38,7 @@ export interface UmeanMessages {
   // --- Slash groups ---
   slashGroupBasic: string;
   slashGroupList: string;
+  slashGroupCallout: string;
   slashGroupInsert: string;
   slashGroupMedia: string;
 
@@ -51,7 +52,9 @@ export interface UmeanMessages {
   slashTaskList: string;
   slashBlockquote: string;
   slashCallout: string;
+  slashCalloutTip: string;
   slashCalloutWarning: string;
+  slashCalloutDanger: string;
   slashCodeBlock: string;
   slashHorizontalRule: string;
   slashTable: string;
@@ -89,6 +92,7 @@ const ZH_CN: UmeanMessages = {
 
   slashGroupBasic: '基础',
   slashGroupList: '列表',
+  slashGroupCallout: '提示块',
   slashGroupInsert: '插入',
   slashGroupMedia: '媒体',
 
@@ -100,8 +104,10 @@ const ZH_CN: UmeanMessages = {
   slashOrderedList: '有序列表',
   slashTaskList: '任务列表',
   slashBlockquote: '引用',
-  slashCallout: '提示块',
+  slashCallout: '信息块',
+  slashCalloutTip: '提示块',
   slashCalloutWarning: '警告块',
+  slashCalloutDanger: '危险块',
   slashCodeBlock: '代码块',
   slashHorizontalRule: '分割线',
   slashTable: '表格',
@@ -139,6 +145,7 @@ const EN: UmeanMessages = {
 
   slashGroupBasic: 'Basic',
   slashGroupList: 'List',
+  slashGroupCallout: 'Callout',
   slashGroupInsert: 'Insert',
   slashGroupMedia: 'Media',
 
@@ -150,8 +157,10 @@ const EN: UmeanMessages = {
   slashOrderedList: 'Ordered List',
   slashTaskList: 'Task List',
   slashBlockquote: 'Blockquote',
-  slashCallout: 'Callout',
+  slashCallout: 'Info Callout',
+  slashCalloutTip: 'Tip Callout',
   slashCalloutWarning: 'Warning Callout',
+  slashCalloutDanger: 'Danger Callout',
   slashCodeBlock: 'Code Block',
   slashHorizontalRule: 'Horizontal Rule',
   slashTable: 'Table',

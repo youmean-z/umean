@@ -7,6 +7,7 @@ import type {
   KeyboardShortcutBinding,
   KeyboardShortcutsOptions,
 } from '../commands/types';
+import { isHeading1ToggleAllowed } from '../utils/headingPolicyUtils';
 
 function isActionId(value: KeyboardShortcutBinding): value is EditorActionId {
   return typeof value === 'string';
@@ -32,7 +33,13 @@ function buildShortcutMap(
 
     if (isActionId(binding)) {
       const action = binding;
-      map[keys] = () => runEditorAction(editor, action);
+      map[keys] = () => {
+        // document/chunk：吞掉 H1 快捷键，避免回落到 StarterKit 仍可切一级标题
+        if (action === 'toggleHeading1' && !isHeading1ToggleAllowed(editor)) {
+          return true;
+        }
+        return runEditorAction(editor, action);
+      };
     }
   }
 

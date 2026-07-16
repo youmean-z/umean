@@ -4,6 +4,8 @@ import {
   createEmptyParagraphDoc,
   isEmptyDocContent,
   applyHeadingPolicy,
+  getEditorHeadingPolicyMode,
+  isHeading1ToggleAllowed,
 } from './headingPolicyUtils';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
@@ -232,6 +234,41 @@ describe('HeadingPolicy extension (integration)', () => {
     // If not yet applied (timing), changed will be true
     // Either way, the pure function was tested separately and works
     expect(typeof changed).toBe('boolean');
+    editor.destroy();
+  });
+});
+
+describe('isHeading1ToggleAllowed', () => {
+  it('allows h1 when headingPolicy is absent (free)', () => {
+    const editor = new Editor({
+      extensions: [StarterKit],
+      element: null,
+      content: '<p>hi</p>',
+    });
+    expect(getEditorHeadingPolicyMode(editor)).toBe('free');
+    expect(isHeading1ToggleAllowed(editor)).toBe(true);
+    editor.destroy();
+  });
+
+  it('blocks h1 in document mode', () => {
+    const editor = new Editor({
+      extensions: [StarterKit, HeadingPolicy.configure({ mode: 'document' })],
+      element: null,
+      content: '<p>hi</p>',
+    });
+    expect(getEditorHeadingPolicyMode(editor)).toBe('document');
+    expect(isHeading1ToggleAllowed(editor)).toBe(false);
+    editor.destroy();
+  });
+
+  it('blocks h1 in chunk mode', () => {
+    const editor = new Editor({
+      extensions: [StarterKit, HeadingPolicy.configure({ mode: 'chunk' })],
+      element: null,
+      content: '<p>hi</p>',
+    });
+    expect(getEditorHeadingPolicyMode(editor)).toBe('chunk');
+    expect(isHeading1ToggleAllowed(editor)).toBe(false);
     editor.destroy();
   });
 });

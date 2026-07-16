@@ -40,6 +40,8 @@ export {
   createDocumentDoc,
   createEmptyParagraphDoc,
   isEmptyDocContent,
+  getEditorHeadingPolicyMode,
+  isHeading1ToggleAllowed,
   type ApplyHeadingPolicyOptions,
 } from './utils/headingPolicyUtils';
 export {

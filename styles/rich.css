@@ -72,6 +72,15 @@
   border-color: #334155;
   background: #1e293b;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  scrollbar-color: #64748b transparent;
+}
+
+.umean-slash::-webkit-scrollbar-thumb {
+  background: #64748b;
+}
+
+.umean-slash::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .umean-slash-group {

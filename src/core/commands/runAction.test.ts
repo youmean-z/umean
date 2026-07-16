@@ -90,6 +90,48 @@ describe('runEditorAction', () => {
   });
 });
 
+describe('toggleHeading1 under headingPolicy', () => {
+  it('blocks runAction in document mode', () => {
+    const element = document.createElement('div');
+    document.body.appendChild(element);
+    const editor = new Editor({
+      element,
+      extensions: createDefaultExtensions({
+        headingPolicy: { mode: 'document' },
+      }),
+      content: 'hello',
+      contentType: 'markdown',
+    });
+    editor.commands.setTextSelection(1);
+
+    expect(canRunEditorAction(editor, 'toggleHeading1')).toBe(false);
+    expect(runEditorAction(editor, 'toggleHeading1')).toBe(false);
+
+    editor.destroy();
+    element.remove();
+  });
+
+  it('blocks runAction in chunk mode', () => {
+    const element = document.createElement('div');
+    document.body.appendChild(element);
+    const editor = new Editor({
+      element,
+      extensions: createDefaultExtensions({
+        headingPolicy: { mode: 'chunk' },
+      }),
+      content: 'hello',
+      contentType: 'markdown',
+    });
+    editor.commands.setTextSelection(1);
+
+    expect(canRunEditorAction(editor, 'toggleHeading1')).toBe(false);
+    expect(runEditorAction(editor, 'toggleHeading1')).toBe(false);
+
+    editor.destroy();
+    element.remove();
+  });
+});
+
 describe('canRunEditorAction for all action ids', () => {
   const element = document.createElement('div');
   document.body.appendChild(element);

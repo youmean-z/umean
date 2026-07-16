@@ -230,6 +230,8 @@ function groupLabel(group: string, messages: UmeanMessages): string {
       return messages.slashGroupBasic;
     case 'list':
       return messages.slashGroupList;
+    case 'callout':
+      return messages.slashGroupCallout;
     case 'insert':
       return messages.slashGroupInsert;
     case 'media':

@@ -1,3 +1,4 @@
+import type { Editor } from '@tiptap/core';
 import type { Node as ProseMirrorNode, Schema } from '@tiptap/pm/model';
 import type { Transaction } from '@tiptap/pm/state';
 
@@ -5,6 +6,27 @@ import type { HeadingPolicyMode } from '../types';
 
 export interface ApplyHeadingPolicyOptions {
   mode: HeadingPolicyMode;
+}
+
+/** 从已注册的 `headingPolicy` 扩展读取 mode；未注册视为 `free`。 */
+export function getEditorHeadingPolicyMode(editor: Editor): HeadingPolicyMode {
+  const extension = editor.extensionManager.extensions.find(
+    (item) => item.name === 'headingPolicy',
+  );
+  const mode = extension?.options?.mode as HeadingPolicyMode | undefined;
+  return mode ?? 'free';
+}
+
+/**
+ * 用户是否可通过 Slash / 快捷键 / runAction 主动切换一级标题。
+ * `document` / `chunk` 下 H1 由策略托管，不允许用户入口插入。
+ */
+export function isHeading1ToggleAllowed(editor: Editor): boolean {
+  const mode = getEditorHeadingPolicyMode(editor);
+  if (mode === 'document' || mode === 'chunk') {
+    return false;
+  }
+  return editor.can().toggleHeading({ level: 1 });
 }
 
 function demoteHeadingToLevel2(

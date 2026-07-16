@@ -1,6 +1,7 @@
 import type { Editor } from '@tiptap/core';
 import type { ChainedCommands } from '@tiptap/core';
 
+import { isHeading1ToggleAllowed } from '../utils/headingPolicyUtils';
 import type {
   EditorActionId,
   EditorActionPayload,
@@ -63,7 +64,7 @@ const ACTIONS: Record<EditorActionId, ActionDef> = {
   },
   toggleHeading1: {
     run: (c) => c.toggleHeading({ level: 1 }),
-    can: (e) => e.can().toggleHeading({ level: 1 }),
+    can: (e) => isHeading1ToggleAllowed(e),
     activeCheck: 'heading',
     activeAttrs: { level: 1 },
   },

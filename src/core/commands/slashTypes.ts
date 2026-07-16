@@ -3,7 +3,13 @@ import type { Editor } from '@tiptap/core';
 import type { UmeanMessages } from '../i18n';
 import type { EditorActionId, EditorActionPayloadMap } from './types';
 
-export type SlashItemGroup = 'basic' | 'list' | 'insert' | 'media' | (string & {});
+export type SlashItemGroup =
+  | 'basic'
+  | 'list'
+  | 'callout'
+  | 'insert'
+  | 'media'
+  | (string & {});
 
 export interface SlashItem {
   id: string;

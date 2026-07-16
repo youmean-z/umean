@@ -1,6 +1,7 @@
 import type { Editor } from '@tiptap/core';
 
 import { ZH_CN, type UmeanMessages } from '../i18n';
+import { isHeading1ToggleAllowed } from '../utils/headingPolicyUtils';
 import type { SlashItem } from './slashTypes';
 
 /**
@@ -72,17 +73,33 @@ export function buildDefaultSlashItems(
       id: 'insertCallout',
       action: 'insertCallout',
       title: messages.slashCallout,
-      keywords: ['callout', 'info', '提示', '注意'],
-      group: 'insert',
+      keywords: ['callout', 'info', '信息', '注意'],
+      group: 'callout',
       payload: { type: 'info' },
+    },
+    {
+      id: 'insertCalloutTip',
+      action: 'insertCallout',
+      title: messages.slashCalloutTip,
+      keywords: ['callout', 'tip', '提示', '注意'],
+      group: 'callout',
+      payload: { type: 'tip' },
     },
     {
       id: 'insertCalloutWarning',
       action: 'insertCallout',
       title: messages.slashCalloutWarning,
       keywords: ['callout', 'warning', '警告', '注意'],
-      group: 'insert',
+      group: 'callout',
       payload: { type: 'warning' },
+    },
+    {
+      id: 'insertCalloutDanger',
+      action: 'insertCallout',
+      title: messages.slashCalloutDanger,
+      keywords: ['callout', 'danger', '危险', '注意'],
+      group: 'callout',
+      payload: { type: 'danger' },
     },
     {
       id: 'toggleCodeBlock',
@@ -144,10 +161,7 @@ export function getDefaultSlashItems(
     if (item.when && !item.when(editor)) {
       return false;
     }
-    if (
-      item.action === 'toggleHeading1' &&
-      !editor.can().toggleHeading({ level: 1 })
-    ) {
+    if (item.action === 'toggleHeading1' && !isHeading1ToggleAllowed(editor)) {
       return false;
     }
     if (item.action === 'insertCallout' && !editor.schema.nodes.callout) {
