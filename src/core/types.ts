@@ -12,6 +12,7 @@ import type { MarkdownExtensionOptions } from '@tiptap/markdown';
 import type { StarterKitOptions } from '@tiptap/starter-kit';
 
 import type { CalloutOptions } from './extensions/callout';
+import type { BlockDragHandleOptions } from './extensions/blockDragHandle';
 import type { DirtyStateOptions } from './extensions/dirtyState';
 import type { FindReplaceOptions } from './extensions/findReplace';
 import type { KeyboardShortcutsOptions } from './commands/types';
@@ -120,6 +121,11 @@ export interface DefaultExtensionsOptions {
    * `setContent` / 保存成功后请调用 `markClean()`；headingPolicy 自动修正不计脏。
    */
   dirtyState?: DirtyStateOptions | false;
+  /**
+   * 顶层块左侧拖拽手柄。默认启用；`false` 关闭。
+   * 仅手柄可拖；公式/代码/Mermaid 等 NodeView 已禁用整块原生拖拽。
+   */
+  blockDragHandle?: BlockDragHandleOptions | false;
   /** Image / TaskList / Table / CodeBlockLowlight，默认全部启用 */
   rich?: RichExtensionsOptions | false;
 }

@@ -74,6 +74,7 @@ class BlockMathNodeView implements NodeView {
 
     this.dom = document.createElement('div');
     this.dom.className = 'block-math-nodeview';
+    this.dom.draggable = false;
 
     this.toolbar = document.createElement('div');
     this.toolbar.className = 'block-math-toolbar';
@@ -164,6 +165,16 @@ class BlockMathNodeView implements NodeView {
   }
 
   stopEvent(event: Event): boolean {
+    // 禁止从公式块本体发起原生拖拽（改用左侧手柄）
+    if (
+      event.type === 'dragstart' ||
+      event.type === 'drag' ||
+      event.type === 'dragend' ||
+      event.type === 'drop'
+    ) {
+      return true;
+    }
+
     const target = event.target as Node;
     if (this.toolbar.contains(target)) return true;
     if (!this.isPreview && this.sourceArea.contains(target)) return true;
@@ -283,6 +294,8 @@ function enterEditModeForBlockMathAt(view: EditorView, pos: number): boolean {
 
 /** 覆盖默认 BlockMath NodeView，并追加 $$$ + 空格快捷输入与 Backspace 进编辑 */
 export const BlockMathWithNodeView = BlockMath.extend<BlockMathNodeViewOptions>({
+  draggable: false,
+
   addNodeView() {
     const { katexOptions, messages } = this.options;
 

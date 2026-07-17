@@ -603,3 +603,71 @@
   background: #f59e0b;
   box-shadow: 0 0 0 1px rgba(146, 64, 14, 0.35);
 }
+
+/* --------------------------------------------------------------------------
+   块拖拽手柄
+   手柄用负 margin 伸进宿主容器左侧 padding，ProseMirror 不再额外加 gutter，
+   正文左右与容器内边距对称。宿主建议左右 padding ≥ 1.75rem。
+   -------------------------------------------------------------------------- */
+.umean-editor .ProseMirror {
+  padding-left: 0;
+}
+
+.umean-editor .ProseMirror > .umean-drag-handle {
+  float: left;
+  clear: left;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1.25rem;
+  /* 负 margin 伸进宿主左 padding：左侧留空 ~0.45rem，右侧与正文 ~0.4rem */
+  margin: 0.15em 0.4rem 0 -1.35rem;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.7rem;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  cursor: grab;
+  user-select: none;
+  opacity: 0;
+}
+
+.umean-editor .ProseMirror > .umean-drag-handle::before {
+  content: '⋮⋮';
+}
+
+.umean-editor .ProseMirror > .umean-drag-handle:hover,
+.umean-editor .ProseMirror > .umean-drag-handle:focus-visible,
+.umean-editor .ProseMirror > .umean-drag-handle:has(+ :hover) {
+  opacity: 1;
+}
+
+.umean-editor .ProseMirror > .umean-drag-handle:hover {
+  background: rgba(148, 163, 184, 0.22);
+  color: #64748b;
+}
+
+.umean-editor .ProseMirror > .umean-drag-handle:active {
+  cursor: grabbing;
+}
+
+/* 手柄拖拽中：隐藏默认 Dropcursor（避免画在引用/提示内部） */
+body:has(.ProseMirror.umean-block-dragging) .prosemirror-dropcursor-block,
+body:has(.ProseMirror.umean-block-dragging) .prosemirror-dropcursor-inline,
+.umean-editor:has(.ProseMirror.umean-block-dragging) .prosemirror-dropcursor-block,
+.umean-editor:has(.ProseMirror.umean-block-dragging) .prosemirror-dropcursor-inline {
+  display: none !important;
+}
+
+.umean-block-drop-indicator {
+  position: absolute;
+  z-index: 50;
+  pointer-events: none;
+  border-radius: 1px;
+  background: #3b82f6;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.25);
+}

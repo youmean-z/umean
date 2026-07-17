@@ -7,6 +7,14 @@ export {
 } from './extensions/blockMathNodeView';
 export { HeadingPolicy } from './extensions/headingPolicy';
 export {
+  BlockDragHandle,
+  blockDragHandlePluginKey,
+  moveTopLevelBlock,
+  resolveTopLevelDropPos,
+  type BlockDragHandleOptions,
+  type BlockDragHandlePluginState,
+} from './extensions/blockDragHandle';
+export {
   DirtyState,
   dirtyStatePluginKey,
   getDirtyState,

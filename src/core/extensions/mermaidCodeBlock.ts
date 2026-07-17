@@ -84,6 +84,7 @@ export class MermaidNodeView implements NodeView {
 
     this.dom = document.createElement('div');
     this.dom.className = 'mermaid-nodeview';
+    this.dom.draggable = false;
 
     this.toolbar = document.createElement('div');
     this.toolbar.className = 'mermaid-toolbar';
@@ -171,6 +172,15 @@ export class MermaidNodeView implements NodeView {
   }
 
   stopEvent(event: Event): boolean {
+    if (
+      event.type === 'dragstart' ||
+      event.type === 'drag' ||
+      event.type === 'dragend' ||
+      event.type === 'drop'
+    ) {
+      return true;
+    }
+
     const target = event.target as Node;
     if (this.toolbar.contains(target)) {
       return true;

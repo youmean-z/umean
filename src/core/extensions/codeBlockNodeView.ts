@@ -188,6 +188,7 @@ export class CodeBlockToolbarNodeView implements NodeView {
 
     this.dom = document.createElement('div');
     this.dom.className = 'code-block-nodeview';
+    this.dom.draggable = false;
 
     this.toolbar = document.createElement('div');
     this.toolbar.className = 'code-block-toolbar';
@@ -274,6 +275,15 @@ export class CodeBlockToolbarNodeView implements NodeView {
   }
 
   stopEvent(event: Event): boolean {
+    if (
+      event.type === 'dragstart' ||
+      event.type === 'drag' ||
+      event.type === 'dragend' ||
+      event.type === 'drop'
+    ) {
+      return true;
+    }
+
     const target = event.target as Node;
     return (
       this.toolbar.contains(target) || this.languageMenu.contains(target)

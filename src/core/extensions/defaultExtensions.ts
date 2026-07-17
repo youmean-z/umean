@@ -13,6 +13,7 @@ import type {
 import { resolveStarterKitLink } from '../utils/linkDefaults';
 import { resolveSlashOptions } from '../media/resolveSlashUpload';
 import { createEditorPlaceholder } from './editorPlaceholder';
+import { BlockDragHandle } from './blockDragHandle';
 import { DirtyState } from './dirtyState';
 import { FindReplace } from './findReplace';
 import { HeadingPolicy } from './headingPolicy';
@@ -130,6 +131,14 @@ export function createTenTapSupplementalExtensions(
     );
   }
 
+  if (options.blockDragHandle !== false) {
+    extensions.push(
+      options.blockDragHandle
+        ? BlockDragHandle.configure(options.blockDragHandle)
+        : BlockDragHandle,
+    );
+  }
+
   appendPolicyExtensions(extensions, options);
 
   return extensions;
@@ -186,6 +195,14 @@ export function createDefaultExtensions(
       options.dirtyState
         ? DirtyState.configure(options.dirtyState)
         : DirtyState,
+    );
+  }
+
+  if (options.blockDragHandle !== false) {
+    extensions.push(
+      options.blockDragHandle
+        ? BlockDragHandle.configure(options.blockDragHandle)
+        : BlockDragHandle,
     );
   }
 

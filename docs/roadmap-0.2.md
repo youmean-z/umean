@@ -11,8 +11,7 @@
 
 ## P1
 
-- [ ] 内容折叠：先做标题；左侧折叠控件；`toggleFold` / `foldAll` / `unfoldAll`；状态默认不进文档 JSON
-- [ ] 块拖拽：顶层 block 左侧手柄；原生 drag/drop 移动节点
+- [x] 块拖拽：顶层 block 左侧手柄；仅顶层兄弟换位（不嵌入 callout/blockquote）；公式/代码/Mermaid 禁用整块原生拖
 
 ## P2
 
