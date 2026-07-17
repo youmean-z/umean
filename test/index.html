@@ -200,6 +200,65 @@
         color: #94a3b8;
         white-space: nowrap;
       }
+
+      .demo-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.55rem 0.85rem;
+        border-bottom: 1px solid #334155;
+        background: #151c2c;
+      }
+
+      .demo-bar button,
+      .demo-bar label {
+        padding: 0.3rem 0.55rem;
+        border: 1px solid #475569;
+        border-radius: 6px;
+        background: #1e293b;
+        color: #e2e8f0;
+        font: inherit;
+        font-size: 0.78rem;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .demo-bar button:hover,
+      .demo-bar label:hover {
+        background: #334155;
+      }
+
+      .demo-bar label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .demo-bar .stats {
+        margin-left: auto;
+        font-size: 0.78rem;
+        color: #94a3b8;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .shortcut-panel {
+        display: none;
+        max-height: 180px;
+        overflow: auto;
+        margin: 0;
+        padding: 0.55rem 0.85rem;
+        border-bottom: 1px solid #334155;
+        background: #0f172a;
+        color: #cbd5e1;
+        font-family: ui-monospace, monospace;
+        font-size: 0.75rem;
+        white-space: pre-wrap;
+      }
+
+      .shortcut-panel.is-open {
+        display: block;
+      }
     </style>
   </head>
   <body>
@@ -208,6 +267,13 @@
     <div class="layout">      
       <div class="panel">
         <div class="panel-header">编辑器 · <kbd>Ctrl/Cmd+F</kbd> 查找替换</div>
+        <div class="demo-bar" id="demo-bar">
+          <button type="button" id="btn-insert-template">插入模板</button>
+          <label><input id="toggle-readonly" type="checkbox" /> 只读预览</label>
+          <button type="button" id="btn-toggle-shortcuts">快捷键表</button>
+          <span class="stats" id="word-stats">字数 —</span>
+        </div>
+        <pre class="shortcut-panel" id="shortcut-panel" hidden></pre>
         <div class="find-bar" id="find-bar" hidden>
           <input id="find-query" type="search" placeholder="查找…" autocomplete="off" />
           <input id="find-replace" type="text" placeholder="替换为…" autocomplete="off" />

@@ -42,9 +42,19 @@ export {
   type FlatHeading,
 } from './utils/headings';
 export {
+  countWords,
+  countChars,
+  getNodePlainText,
+  getWordCount,
+  getCharCount,
+  getSelectedWordCount,
+  getSelectedCharCount,
+} from './utils/wordCount';
+export {
   ZH_CN,
   EN,
   resolveMessages,
+  getActionLabel,
   type UmeanMessages,
 } from './i18n';
 export {
@@ -119,6 +129,10 @@ export {
   DEFAULT_SHORTCUT_BINDINGS,
   resolveShortcutBindings,
 } from './commands/defaultShortcuts';
+export {
+  getShortcutList,
+  type ShortcutListItem,
+} from './commands/shortcutList';
 export {
   runEditorAction,
   canRunEditorAction,

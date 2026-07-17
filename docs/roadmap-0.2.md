@@ -15,7 +15,7 @@
 
 ## P2
 
-- [ ] `insertTemplate(content: JSONContent)` 插入预定义片段
-- [ ] 字数统计：`getWordCount` / `getCharCount` / `getSelectedWordCount`
-- [ ] 只读/预览：`setEditable(false)` + 隐藏光标/placeholder
-- [ ] `getShortcutList()` 导出当前绑键表（应用层自行渲染）
+- [x] `insertTemplate(content: JSONContent)` 插入预定义片段
+- [x] 字数统计：`getWordCount` / `getCharCount` / `getSelectedWordCount`
+- [x] 只读/预览：`setEditable(false)` + 隐藏光标/placeholder/拖拽手柄
+- [x] `getShortcutList()` 导出当前绑键表（应用层自行渲染）

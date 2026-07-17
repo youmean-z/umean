@@ -524,6 +524,30 @@
 }
 
 /* --------------------------------------------------------------------------
+   只读 / 预览：隐藏光标、placeholder、拖拽手柄
+   -------------------------------------------------------------------------- */
+.umean-editor .ProseMirror[contenteditable='false'] {
+  caret-color: transparent;
+  cursor: default;
+}
+
+.umean-editor .ProseMirror[contenteditable='false'] p.is-empty::before,
+.umean-editor .ProseMirror[contenteditable='false'] h1.is-empty::before,
+.umean-editor .ProseMirror[contenteditable='false'] h2.is-empty::before,
+.umean-editor .ProseMirror[contenteditable='false'] h3.is-empty::before,
+.umean-editor .ProseMirror[contenteditable='false'] h4.is-empty::before,
+.umean-editor .ProseMirror[contenteditable='false'] h5.is-empty::before,
+.umean-editor .ProseMirror[contenteditable='false'] h6.is-empty::before {
+  content: none;
+}
+
+.umean-editor .ProseMirror[contenteditable='false'] > .umean-drag-handle {
+  /* 保留 float 占位，避免只读切换时正文左右跳动 */
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
    Slash 命令菜单（portal 到 body，选择器不依赖 .umean-editor 祖先）
    -------------------------------------------------------------------------- */
 .umean-slash {

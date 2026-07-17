@@ -39,8 +39,10 @@ const DEMO_MARKDOWN = `# 公式与流程图测试
 行内公式：$E=mc^2$ 以及 $\\alpha + \\beta = \\gamma$
 
 $$
-\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2} \\\\
-E=mc^2
+\\begin{aligned}
+\\sum_{i=1}^{n} i &= \\frac{n(n+1)}{2} \\\\
+E &= mc^2
+\\end{aligned}
 $$
 
 代码块（顶栏语言下拉 + 复制）：
@@ -142,12 +144,119 @@ const core = createEditor({
     if (markdownOutputEl) {
       markdownOutputEl.textContent = markdown;
     }
+    updateWordStats();
+  },
+  onSelectionUpdate: () => {
+    updateWordStats();
   },
   editorProps: {
     attributes: {
       class: 'editor-content',
     },
   },
+});
+
+const wordStatsEl = document.querySelector('#word-stats');
+const readonlyToggleEl = document.querySelector(
+  '#toggle-readonly',
+) as HTMLInputElement | null;
+const insertTemplateBtn = document.querySelector('#btn-insert-template');
+const toggleShortcutsBtn = document.querySelector('#btn-toggle-shortcuts');
+const shortcutPanelEl = document.querySelector(
+  '#shortcut-panel',
+) as HTMLElement | null;
+
+const DEMO_TEMPLATE = {
+  type: 'doc' as const,
+  content: [
+    {
+      type: 'heading',
+      attrs: { level: 2 },
+      content: [{ type: 'text', text: '会议纪要模板' }],
+    },
+    {
+      type: 'paragraph',
+      content: [{ type: 'text', text: '日期：' }],
+    },
+    {
+      type: 'bulletList',
+      content: [
+        {
+          type: 'listItem',
+          content: [
+            {
+              type: 'paragraph',
+              content: [{ type: 'text', text: '议题一' }],
+            },
+          ],
+        },
+        {
+          type: 'listItem',
+          content: [
+            {
+              type: 'paragraph',
+              content: [{ type: 'text', text: '待办事项' }],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      type: 'callout',
+      attrs: { type: 'info' },
+      content: [
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: '会后跟进写在这里。' }],
+        },
+      ],
+    },
+  ],
+};
+
+function updateWordStats(): void {
+  if (!wordStatsEl) {
+    return;
+  }
+  const words = core.getWordCount();
+  const chars = core.getCharCount({ excludeWhitespace: true });
+  const selected = core.getSelectedWordCount();
+  wordStatsEl.textContent =
+    selected > 0
+      ? `词 ${words} · 字 ${chars} · 选中 ${selected} 词`
+      : `词 ${words} · 字 ${chars}`;
+}
+
+function renderShortcutPanel(): void {
+  if (!shortcutPanelEl) {
+    return;
+  }
+  const lines = core.getShortcutList().map((item) => {
+    return `${item.keys.padEnd(16)} ${item.label}`;
+  });
+  shortcutPanelEl.textContent = lines.join('\n');
+}
+
+updateWordStats();
+renderShortcutPanel();
+
+readonlyToggleEl?.addEventListener('change', () => {
+  core.setEditable(!readonlyToggleEl.checked);
+});
+
+insertTemplateBtn?.addEventListener('click', () => {
+  if (!core.isEditable()) {
+    return;
+  }
+  core.insertTemplate(DEMO_TEMPLATE);
+});
+
+toggleShortcutsBtn?.addEventListener('click', () => {
+  if (!shortcutPanelEl) {
+    return;
+  }
+  const open = shortcutPanelEl.classList.toggle('is-open');
+  shortcutPanelEl.hidden = !open;
 });
 
 if (jsonOutputEl) {

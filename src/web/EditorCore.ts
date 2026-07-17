@@ -5,6 +5,10 @@ import {
   isEditorActionActive,
   runEditorAction,
 } from '../core/commands/runAction';
+import {
+  getShortcutList,
+  type ShortcutListItem,
+} from '../core/commands/shortcutList';
 import type {
   EditorActionId,
   EditorActionPayload,
@@ -21,6 +25,12 @@ import {
   scrollToHeading,
   type HeadingItem,
 } from '../core/utils/headings';
+import {
+  getCharCount,
+  getSelectedCharCount,
+  getSelectedWordCount,
+  getWordCount,
+} from '../core/utils/wordCount';
 import type { EditorCoreOptions, EditorSelectionPayload } from './types';
 
 function mergeExtensionOptions(
@@ -53,10 +63,26 @@ function mergeExtensionOptions(
   };
 }
 
+function resolveShortcutOptions(
+  extensionOptions: DefaultExtensionsOptions | undefined,
+  shortcuts: KeyboardShortcutsOptions | false | undefined,
+): KeyboardShortcutsOptions | false {
+  const merged = mergeExtensionOptions(extensionOptions, shortcuts);
+  if (merged?.shortcuts === false) {
+    return false;
+  }
+  if (merged?.shortcuts && typeof merged.shortcuts === 'object') {
+    return merged.shortcuts;
+  }
+  return {};
+}
+
 export class EditorCore {
   readonly editor: Editor;
   private _onDestroy?: () => void;
   private _onSelectionUpdate?: EditorCoreOptions['onSelectionUpdate'];
+  private readonly _shortcutOptions: KeyboardShortcutsOptions | false;
+  private readonly _locale: DefaultExtensionsOptions['locale'];
 
   constructor(options: EditorCoreOptions = {}) {
     const {
@@ -73,6 +99,8 @@ export class EditorCore {
 
     this._onDestroy = onDestroy;
     this._onSelectionUpdate = onSelectionUpdate;
+    this._shortcutOptions = resolveShortcutOptions(extensionOptions, shortcuts);
+    this._locale = extensionOptions?.locale;
 
     this.editor = new Editor({
       ...editorOptions,
@@ -133,6 +161,54 @@ export class EditorCore {
   setMarkdown(markdown: string): void {
     this.editor.commands.setContent(markdown, { contentType: 'markdown' });
     this.markClean();
+  }
+
+  /**
+   * 在当前选区插入预定义片段。
+   * 传入完整 `doc` 时插入其 `content`；否则按节点/片段插入。
+   */
+  insertTemplate(content: JSONContent): boolean {
+    const payload =
+      content.type === 'doc' && Array.isArray(content.content)
+        ? content.content
+        : content;
+    return this.editor.chain().focus().insertContent(payload).run();
+  }
+
+  /** 全文词数（CJK 按字、拉丁按词）。 */
+  getWordCount(): number {
+    return getWordCount(this.editor);
+  }
+
+  /** 全文字符数；`excludeWhitespace` 时去掉空白。 */
+  getCharCount(options?: { excludeWhitespace?: boolean }): number {
+    return getCharCount(this.editor, options);
+  }
+
+  /** 选区词数；空选区为 0。 */
+  getSelectedWordCount(): number {
+    return getSelectedWordCount(this.editor);
+  }
+
+  /** 选区字符数；空选区为 0。 */
+  getSelectedCharCount(options?: { excludeWhitespace?: boolean }): number {
+    return getSelectedCharCount(this.editor, options);
+  }
+
+  /**
+   * 切换可编辑。false 为只读/预览（隐藏光标、placeholder、拖拽手柄，见样式）。
+   */
+  setEditable(editable: boolean): void {
+    this.editor.setEditable(editable);
+  }
+
+  isEditable(): boolean {
+    return this.editor.isEditable;
+  }
+
+  /** 导出当前生效的快捷键表（含 i18n 显示名，应用层自行渲染）。 */
+  getShortcutList(): ShortcutListItem[] {
+    return getShortcutList(this._shortcutOptions, { locale: this._locale });
   }
 
   /** 文档是否有未保存变更（需启用 dirtyState 扩展）。 */

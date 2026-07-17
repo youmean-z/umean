@@ -163,4 +163,75 @@ describe('EditorCore', () => {
     );
     expect(ext?.options.bindings?.['Mod-k']).toBe(handler);
   });
+
+  it('insertTemplate inserts fragment at selection', () => {
+    core = new EditorCore({ element: container });
+    core.setJSON({
+      type: 'doc',
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'x' }] }],
+    });
+    core.editor.commands.setTextSelection(2);
+    expect(
+      core.insertTemplate({
+        type: 'paragraph',
+        content: [{ type: 'text', text: 'tpl' }],
+      }),
+    ).toBe(true);
+    expect(core.getHTML()).toContain('tpl');
+  });
+
+  it('insertTemplate unwraps doc content', () => {
+    core = new EditorCore({ element: container });
+    expect(
+      core.insertTemplate({
+        type: 'doc',
+        content: [
+          { type: 'heading', attrs: { level: 2 }, content: [{ type: 'text', text: 'T' }] },
+          { type: 'paragraph', content: [{ type: 'text', text: 'body' }] },
+        ],
+      }),
+    ).toBe(true);
+    expect(core.getHTML()).toContain('<h2>T</h2>');
+    expect(core.getHTML()).toContain('body');
+  });
+
+  it('word / char counts work', () => {
+    core = new EditorCore({
+      element: container,
+      content: {
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [{ type: 'text', text: 'hi 你' }],
+          },
+        ],
+      },
+    });
+    expect(core.getWordCount()).toBe(2);
+    expect(core.getCharCount()).toBe(4);
+    core.editor.commands.setTextSelection({ from: 1, to: 3 });
+    expect(core.getSelectedWordCount()).toBe(1);
+  });
+
+  it('setEditable toggles readonly', () => {
+    core = new EditorCore({ element: container });
+    expect(core.isEditable()).toBe(true);
+    core.setEditable(false);
+    expect(core.isEditable()).toBe(false);
+    expect(core.editor.view.dom.getAttribute('contenteditable')).toBe('false');
+    core.setEditable(true);
+    expect(core.isEditable()).toBe(true);
+  });
+
+  it('getShortcutList reflects configured bindings', () => {
+    core = new EditorCore({
+      element: container,
+      shortcuts: { bindings: { 'Mod-b': false } },
+    });
+    const list = core.getShortcutList();
+    expect(list.find((i) => i.keys === 'Mod-b')?.disabled).toBe(true);
+    expect(list.find((i) => i.keys === 'Mod-b')?.label).toBe('已禁用');
+    expect(list.find((i) => i.keys === 'Mod-i')?.label).toBe('斜体');
+  });
 });

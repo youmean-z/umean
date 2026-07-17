@@ -3,6 +3,8 @@
  * 默认 zh-CN，通过 `DefaultExtensionsOptions.locale` 切换。
  * 切换语言需重建编辑器（库级不支持运行时热切换）。
  */
+import type { EditorActionId } from './commands/types';
+
 export interface UmeanMessages {
   // --- Placeholder ---
   placeholderTitle: string;
@@ -61,6 +63,38 @@ export interface UmeanMessages {
   slashInlineMath: string;
   slashBlockMath: string;
   slashImage: string;
+
+  // --- Editor actions（工具栏 / 快捷键说明） ---
+  actionUndo: string;
+  actionRedo: string;
+  actionToggleBold: string;
+  actionToggleItalic: string;
+  actionToggleStrike: string;
+  actionToggleCode: string;
+  actionToggleHighlight: string;
+  actionSetParagraph: string;
+  actionToggleHeading1: string;
+  actionToggleHeading2: string;
+  actionToggleHeading3: string;
+  actionToggleHeading4: string;
+  actionToggleHeading5: string;
+  actionToggleHeading6: string;
+  actionToggleBulletList: string;
+  actionToggleOrderedList: string;
+  actionToggleTaskList: string;
+  actionToggleBlockquote: string;
+  actionInsertCallout: string;
+  actionToggleCodeBlock: string;
+  actionSetHorizontalRule: string;
+  actionInsertTable: string;
+  actionInsertImage: string;
+  actionInsertInlineMath: string;
+  actionInsertBlockMath: string;
+  actionSetLink: string;
+  actionUnsetLink: string;
+  actionExitLink: string;
+  shortcutDisabled: string;
+  shortcutCustom: string;
 }
 
 const ZH_CN: UmeanMessages = {
@@ -114,6 +148,37 @@ const ZH_CN: UmeanMessages = {
   slashInlineMath: '行内公式',
   slashBlockMath: '块级公式',
   slashImage: '图片',
+
+  actionUndo: '撤销',
+  actionRedo: '重做',
+  actionToggleBold: '加粗',
+  actionToggleItalic: '斜体',
+  actionToggleStrike: '删除线',
+  actionToggleCode: '行内代码',
+  actionToggleHighlight: '高亮',
+  actionSetParagraph: '正文',
+  actionToggleHeading1: '一级标题',
+  actionToggleHeading2: '二级标题',
+  actionToggleHeading3: '三级标题',
+  actionToggleHeading4: '四级标题',
+  actionToggleHeading5: '五级标题',
+  actionToggleHeading6: '六级标题',
+  actionToggleBulletList: '无序列表',
+  actionToggleOrderedList: '有序列表',
+  actionToggleTaskList: '任务列表',
+  actionToggleBlockquote: '引用',
+  actionInsertCallout: '提示块',
+  actionToggleCodeBlock: '代码块',
+  actionSetHorizontalRule: '分割线',
+  actionInsertTable: '表格',
+  actionInsertImage: '图片',
+  actionInsertInlineMath: '行内公式',
+  actionInsertBlockMath: '块级公式',
+  actionSetLink: '设置链接',
+  actionUnsetLink: '取消链接',
+  actionExitLink: '退出链接',
+  shortcutDisabled: '已禁用',
+  shortcutCustom: '自定义',
 };
 
 const EN: UmeanMessages = {
@@ -167,6 +232,37 @@ const EN: UmeanMessages = {
   slashInlineMath: 'Inline Math',
   slashBlockMath: 'Block Math',
   slashImage: 'Image',
+
+  actionUndo: 'Undo',
+  actionRedo: 'Redo',
+  actionToggleBold: 'Bold',
+  actionToggleItalic: 'Italic',
+  actionToggleStrike: 'Strikethrough',
+  actionToggleCode: 'Inline Code',
+  actionToggleHighlight: 'Highlight',
+  actionSetParagraph: 'Paragraph',
+  actionToggleHeading1: 'Heading 1',
+  actionToggleHeading2: 'Heading 2',
+  actionToggleHeading3: 'Heading 3',
+  actionToggleHeading4: 'Heading 4',
+  actionToggleHeading5: 'Heading 5',
+  actionToggleHeading6: 'Heading 6',
+  actionToggleBulletList: 'Bullet List',
+  actionToggleOrderedList: 'Ordered List',
+  actionToggleTaskList: 'Task List',
+  actionToggleBlockquote: 'Blockquote',
+  actionInsertCallout: 'Callout',
+  actionToggleCodeBlock: 'Code Block',
+  actionSetHorizontalRule: 'Horizontal Rule',
+  actionInsertTable: 'Table',
+  actionInsertImage: 'Image',
+  actionInsertInlineMath: 'Inline Math',
+  actionInsertBlockMath: 'Block Math',
+  actionSetLink: 'Set Link',
+  actionUnsetLink: 'Unset Link',
+  actionExitLink: 'Exit Link',
+  shortcutDisabled: 'Disabled',
+  shortcutCustom: 'Custom',
 };
 
 /**
@@ -187,6 +283,47 @@ export function resolveMessages(
   }
 
   return { ...ZH_CN, ...locale };
+}
+
+/** EditorActionId → UmeanMessages 字段 */
+const ACTION_MESSAGE_KEYS = {
+  undo: 'actionUndo',
+  redo: 'actionRedo',
+  toggleBold: 'actionToggleBold',
+  toggleItalic: 'actionToggleItalic',
+  toggleStrike: 'actionToggleStrike',
+  toggleCode: 'actionToggleCode',
+  toggleHighlight: 'actionToggleHighlight',
+  setParagraph: 'actionSetParagraph',
+  toggleHeading1: 'actionToggleHeading1',
+  toggleHeading2: 'actionToggleHeading2',
+  toggleHeading3: 'actionToggleHeading3',
+  toggleHeading4: 'actionToggleHeading4',
+  toggleHeading5: 'actionToggleHeading5',
+  toggleHeading6: 'actionToggleHeading6',
+  toggleBulletList: 'actionToggleBulletList',
+  toggleOrderedList: 'actionToggleOrderedList',
+  toggleTaskList: 'actionToggleTaskList',
+  toggleBlockquote: 'actionToggleBlockquote',
+  insertCallout: 'actionInsertCallout',
+  toggleCodeBlock: 'actionToggleCodeBlock',
+  setHorizontalRule: 'actionSetHorizontalRule',
+  insertTable: 'actionInsertTable',
+  insertImage: 'actionInsertImage',
+  insertInlineMath: 'actionInsertInlineMath',
+  insertBlockMath: 'actionInsertBlockMath',
+  setLink: 'actionSetLink',
+  unsetLink: 'actionUnsetLink',
+  exitLink: 'actionExitLink',
+} as const satisfies Record<EditorActionId, keyof UmeanMessages>;
+
+/** 取动作的本地化显示名（工具栏 / 快捷键说明共用）。 */
+export function getActionLabel(
+  action: EditorActionId,
+  messages: UmeanMessages = ZH_CN,
+): string {
+  const key = ACTION_MESSAGE_KEYS[action];
+  return messages[key];
 }
 
 export { ZH_CN, EN };
