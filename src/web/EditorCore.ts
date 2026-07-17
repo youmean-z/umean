@@ -11,10 +11,16 @@ import type {
   KeyboardShortcutsOptions,
 } from '../core/commands/types';
 import { createDefaultExtensions } from '../core/extensions/defaultExtensions';
+import { getDirtyState } from '../core/extensions/dirtyState';
 import {
   emptyDoc,
   type DefaultExtensionsOptions,
 } from '../core/types';
+import {
+  getHeadings,
+  scrollToHeading,
+  type HeadingItem,
+} from '../core/utils/headings';
 import type { EditorCoreOptions, EditorSelectionPayload } from './types';
 
 function mergeExtensionOptions(
@@ -108,6 +114,7 @@ export class EditorCore {
 
   setJSON(json: JSONContent): void {
     this.editor.commands.setContent(json);
+    this.markClean();
   }
 
   getHTML(): string {
@@ -116,6 +123,7 @@ export class EditorCore {
 
   setHTML(html: string): void {
     this.editor.commands.setContent(html, { contentType: 'html' });
+    this.markClean();
   }
 
   getMarkdown(): string {
@@ -124,6 +132,27 @@ export class EditorCore {
 
   setMarkdown(markdown: string): void {
     this.editor.commands.setContent(markdown, { contentType: 'markdown' });
+    this.markClean();
+  }
+
+  /** 文档是否有未保存变更（需启用 dirtyState 扩展）。 */
+  isDirty(): boolean {
+    return getDirtyState(this.editor);
+  }
+
+  /** 标记为已保存/干净（保存成功或主动加载内容后调用）。 */
+  markClean(): boolean {
+    return this.editor.commands.markClean();
+  }
+
+  /** 提取标题树（运行时 id，不写入文档）。 */
+  getHeadings(): HeadingItem[] {
+    return getHeadings(this.editor);
+  }
+
+  /** 跳转到标题位置并滚动进视口。 */
+  scrollToHeading(pos: number): boolean {
+    return scrollToHeading(this.editor, pos);
   }
 
   /** 执行标准动作（工具栏 / Slash / 快捷键共用同一套 ID）。 */

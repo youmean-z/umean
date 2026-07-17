@@ -12,6 +12,7 @@ import type { MarkdownExtensionOptions } from '@tiptap/markdown';
 import type { StarterKitOptions } from '@tiptap/starter-kit';
 
 import type { CalloutOptions } from './extensions/callout';
+import type { DirtyStateOptions } from './extensions/dirtyState';
 import type { FindReplaceOptions } from './extensions/findReplace';
 import type { KeyboardShortcutsOptions } from './commands/types';
 import type { SlashCommandOptions } from './commands/slashTypes';
@@ -114,6 +115,11 @@ export interface DefaultExtensionsOptions {
    * 宿主通过 `editor.commands.setFindQuery` 等命令驱动，不内置面板 UI。
    */
   findReplace?: FindReplaceOptions | false;
+  /**
+   * 脏状态追踪。默认启用；`false` 关闭。
+   * `setContent` / 保存成功后请调用 `markClean()`；headingPolicy 自动修正不计脏。
+   */
+  dirtyState?: DirtyStateOptions | false;
   /** Image / TaskList / Table / CodeBlockLowlight，默认全部启用 */
   rich?: RichExtensionsOptions | false;
 }

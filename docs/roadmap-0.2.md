@@ -6,8 +6,8 @@
 ## P0
 
 - [x] 搜索替换：Decoration 高亮匹配项（区分当前项）；`setFindQuery` / `clearFind` / `findNext` / `findPrevious` / `replaceCurrent` / `replaceAll`
-- [ ] 脏状态：`docChanged` 标记 dirty；`getDirtyState()` / `markClean()`（`setContent`、headingPolicy 自动修正的约定需明确）
-- [ ] 目录：`getHeadings()`（level / text / pos / id / children）；标题自动 id；`scrollToHeading()`
+- [x] 脏状态：`docChanged` 标记 dirty；`getDirtyState()` / `markClean()`（`setContent` 后请 markClean；headingPolicy 自动修正不计脏）
+- [x] 目录：`getHeadings()`（level / text / pos / 运行时 id / children）；`scrollToHeading(pos)`；id 不写入文档
 
 ## P1
 

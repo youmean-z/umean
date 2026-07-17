@@ -7,6 +7,15 @@ export {
 } from './extensions/blockMathNodeView';
 export { HeadingPolicy } from './extensions/headingPolicy';
 export {
+  DirtyState,
+  dirtyStatePluginKey,
+  getDirtyState,
+  skipDirtyTracking,
+  type DirtyStateOptions,
+  type DirtyStatePluginState,
+  type DirtyStateMeta,
+} from './extensions/dirtyState';
+export {
   FindReplace,
   findReplacePluginKey,
   getFindReplaceState,
@@ -16,6 +25,14 @@ export {
   type FindReplaceOptions,
   type SetFindQueryOptions,
 } from './extensions/findReplace';
+export {
+  collectFlatHeadings,
+  buildHeadingTree,
+  getHeadings,
+  scrollToHeading,
+  type HeadingItem,
+  type FlatHeading,
+} from './utils/headings';
 export {
   ZH_CN,
   EN,

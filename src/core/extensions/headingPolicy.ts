@@ -6,6 +6,7 @@ import {
   applyHeadingPolicy,
   createDocumentDoc,
 } from '../utils/headingPolicyUtils';
+import { skipDirtyTracking } from './dirtyState';
 
 const headingPolicyPluginKey = new PluginKey('headingPolicy');
 
@@ -30,6 +31,8 @@ export const HeadingPolicy = Extension.create<HeadingPolicyOptions>({
 
     if (!json.content?.length) {
       editor.commands.setContent(createDocumentDoc());
+      // 初始补标题不算用户编辑
+      editor.commands.markClean?.();
       return;
     }
 
@@ -45,6 +48,7 @@ export const HeadingPolicy = Extension.create<HeadingPolicyOptions>({
         return false;
       }
 
+      skipDirtyTracking(nextTr);
       dispatch(nextTr);
       return true;
     });
@@ -61,7 +65,9 @@ export const HeadingPolicy = Extension.create<HeadingPolicyOptions>({
       new Plugin({
         key: headingPolicyPluginKey,
         appendTransaction(transactions, _oldState, newState) {
-          const docChanged = transactions.some((transaction) => transaction.docChanged);
+          const docChanged = transactions.some(
+            (transaction) => transaction.docChanged,
+          );
           if (!docChanged) {
             return null;
           }
@@ -73,7 +79,12 @@ export const HeadingPolicy = Extension.create<HeadingPolicyOptions>({
             { mode },
           );
 
-          return changed ? tr : null;
+          if (!changed) {
+            return null;
+          }
+
+          skipDirtyTracking(tr);
+          return tr;
         },
       }),
     ];

@@ -13,6 +13,7 @@ import type {
 import { resolveStarterKitLink } from '../utils/linkDefaults';
 import { resolveSlashOptions } from '../media/resolveSlashUpload';
 import { createEditorPlaceholder } from './editorPlaceholder';
+import { DirtyState } from './dirtyState';
 import { FindReplace } from './findReplace';
 import { HeadingPolicy } from './headingPolicy';
 import { KeyboardShortcuts } from './keyboardShortcuts';
@@ -121,6 +122,14 @@ export function createTenTapSupplementalExtensions(
     );
   }
 
+  if (options.dirtyState !== false) {
+    extensions.push(
+      options.dirtyState
+        ? DirtyState.configure(options.dirtyState)
+        : DirtyState,
+    );
+  }
+
   appendPolicyExtensions(extensions, options);
 
   return extensions;
@@ -169,6 +178,14 @@ export function createDefaultExtensions(
       options.findReplace
         ? FindReplace.configure(options.findReplace)
         : FindReplace,
+    );
+  }
+
+  if (options.dirtyState !== false) {
+    extensions.push(
+      options.dirtyState
+        ? DirtyState.configure(options.dirtyState)
+        : DirtyState,
     );
   }
 

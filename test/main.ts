@@ -10,6 +10,7 @@ const jsonOutputEl = document.querySelector('#json-output');
 const htmlOutputEl = document.querySelector('#html-output');
 const markdownOutputEl = document.querySelector('#markdown-output');
 
+const findBarEl = document.querySelector('#find-bar') as HTMLElement | null;
 const findQueryEl = document.querySelector('#find-query') as HTMLInputElement | null;
 const findReplaceEl = document.querySelector('#find-replace') as HTMLInputElement | null;
 const findCaseEl = document.querySelector('#find-case') as HTMLInputElement | null;
@@ -175,6 +176,53 @@ function updateFindStatus(): void {
   findStatusEl.textContent = `${state.activeIndex + 1} / ${state.matches.length}`;
 }
 
+function isFindBarOpen(): boolean {
+  return !!findBarEl?.classList.contains('is-open');
+}
+
+function getEditorSelectedText(): string {
+  const { from, to, empty } = core.editor.state.selection;
+  if (empty || from === to) {
+    return '';
+  }
+  return core.editor.state.doc.textBetween(from, to, '\n', '\0');
+}
+
+function openFindBar(): void {
+  if (!findBarEl) {
+    return;
+  }
+  findBarEl.hidden = false;
+  findBarEl.classList.add('is-open');
+
+  const selected = getEditorSelectedText().trim();
+  if (selected && findQueryEl) {
+    // 单行选区直接作为查询；多行只取第一行，避免把整段塞进搜索框
+    const query = selected.split(/\r?\n/)[0] ?? selected;
+    findQueryEl.value = query;
+    runFindQuery();
+  } else if (findQueryEl?.value) {
+    runFindQuery();
+  }
+
+  findQueryEl?.focus();
+  findQueryEl?.select();
+}
+
+function closeFindBar(): void {
+  if (!findBarEl) {
+    return;
+  }
+  findBarEl.classList.remove('is-open');
+  findBarEl.hidden = true;
+  core.editor.commands.clearFind();
+  if (findQueryEl) {
+    findQueryEl.value = '';
+  }
+  updateFindStatus();
+  core.editor.view.focus();
+}
+
 function runFindQuery(): void {
   const query = findQueryEl?.value ?? '';
   if (!query) {
@@ -191,6 +239,21 @@ function runFindQuery(): void {
   updateFindStatus();
 }
 
+window.addEventListener('keydown', (event) => {
+  const key = event.key.toLowerCase();
+  if ((event.metaKey || event.ctrlKey) && key === 'f') {
+    event.preventDefault();
+    // 已打开时若有新选区，也同步进搜索框
+    openFindBar();
+    return;
+  }
+
+  if (event.key === 'Escape' && isFindBarOpen()) {
+    event.preventDefault();
+    closeFindBar();
+  }
+});
+
 findQueryEl?.addEventListener('input', runFindQuery);
 findCaseEl?.addEventListener('change', runFindQuery);
 
@@ -204,9 +267,8 @@ findQueryEl?.addEventListener('keydown', (event) => {
     }
     updateFindStatus();
   } else if (event.key === 'Escape') {
-    core.editor.commands.clearFind();
-    findQueryEl.value = '';
-    updateFindStatus();
+    event.preventDefault();
+    closeFindBar();
   }
 });
 
@@ -231,11 +293,7 @@ findReplaceAllBtn?.addEventListener('click', () => {
 });
 
 findClearBtn?.addEventListener('click', () => {
-  core.editor.commands.clearFind();
-  if (findQueryEl) {
-    findQueryEl.value = '';
-  }
-  updateFindStatus();
+  closeFindBar();
 });
 
 // 方便控制台调试：core.setMarkdown(...)、core.editor.commands.insertInlineMath(...)
