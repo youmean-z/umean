@@ -14,6 +14,7 @@ import { resolveStarterKitLink } from '../utils/linkDefaults';
 import { resolveSlashOptions } from '../media/resolveSlashUpload';
 import { createEditorPlaceholder } from './editorPlaceholder';
 import { BlockDragHandle } from './blockDragHandle';
+import { BlockquoteKeys } from './blockquoteKeys';
 import { DirtyState } from './dirtyState';
 import { FindReplace } from './findReplace';
 import { HeadingPolicy } from './headingPolicy';
@@ -110,6 +111,7 @@ export function createTenTapSupplementalExtensions(
   const extensions: AnyExtension[] = [];
 
   appendMarkdownExtensions(extensions, options);
+  extensions.push(BlockquoteKeys);
 
   if (isTableShortcutsEnabled(options)) {
     extensions.push(TableShortcut, TableAlignShortcut);
@@ -168,6 +170,7 @@ export function createDefaultExtensions(
     }
 
     extensions.push(StarterKit.configure(starterKitOptions));
+    extensions.push(BlockquoteKeys);
 
     if (starterKitOptions.link !== false) {
       extensions.push(LinkExit);

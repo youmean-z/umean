@@ -27,8 +27,12 @@
   --umean-inline-code-bg: rgba(51, 65, 85, 0.85);
   --umean-inline-code-border: #475569;
   --umean-inline-code-color: #e2e8f0;
-  --umean-quote-border: #64748b;
-  --umean-quote-color: #94a3b8;
+  --umean-quote-border: #818cf8;
+  --umean-quote-outline: rgba(129, 140, 248, 0.28);
+  --umean-quote-color: #cbd5e1;
+  --umean-quote-bg: rgba(129, 140, 248, 0.1);
+  --umean-quote-mark: #818cf8;
+  --umean-quote-source: #94a3b8;
   --umean-table-border: #334155;
   --umean-table-th-bg: #172033;
   --umean-table-th-color: #cbd5e1;
@@ -74,8 +78,12 @@
   --umean-inline-code-bg: #f1f5f9;
   --umean-inline-code-border: #e2e8f0;
   --umean-inline-code-color: #0f172a;
-  --umean-quote-border: #94a3b8;
-  --umean-quote-color: #64748b;
+  --umean-quote-border: #6366f1;
+  --umean-quote-outline: rgba(99, 102, 241, 0.22);
+  --umean-quote-color: #334155;
+  --umean-quote-bg: rgba(99, 102, 241, 0.08);
+  --umean-quote-mark: #818cf8;
+  --umean-quote-source: #64748b;
   --umean-table-border: #e2e8f0;
   --umean-table-th-bg: #f8fafc;
   --umean-table-th-color: #334155;
@@ -196,8 +204,19 @@
 }
 
 .umean-editor .ProseMirror blockquote {
+  border-color: var(--umean-quote-outline);
   border-left-color: var(--umean-quote-border);
+  background: var(--umean-quote-bg);
   color: var(--umean-quote-color);
+}
+
+.umean-editor .ProseMirror blockquote::before {
+  color: var(--umean-quote-mark);
+  opacity: 0.7;
+}
+
+.umean-editor .ProseMirror blockquote > p:last-child:not(:only-child) {
+  color: var(--umean-quote-source);
 }
 
 .umean-editor .ProseMirror .umean-callout {

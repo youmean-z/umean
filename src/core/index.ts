@@ -64,6 +64,7 @@ export {
   type CalloutType,
   type CalloutOptions,
 } from './extensions/callout';
+export { BlockquoteKeys } from './extensions/blockquoteKeys';
 export {
   LinkExit,
   exitLinkStoredMark,

@@ -39,16 +39,60 @@
   -webkit-box-decoration-break: clone;
 }
 
-/* 引用：左色条，轻量区隔正文 */
+/* 引用：卡片 + 左色条；末段（非唯一段）视为出处。
+   引号必须用空 content + 绝对定位：带文字的 ::before 会让 Backspace 卡死。 */
 .umean-editor .ProseMirror blockquote {
-  margin: 0.75rem 0;
-  padding: 0.35rem 0 0.35rem 1rem;
-  border-left: 3px solid #94a3b8;
+  position: relative;
+  margin: 0.85rem 0;
+  padding: 1.7rem 1rem 0.8rem 1.15rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-left-width: 4px;
+  border-left-color: #94a3b8;
+  background: rgba(148, 163, 184, 0.08);
   color: #64748b;
+}
+
+.umean-editor .ProseMirror blockquote::before {
+  content: '';
+  position: absolute;
+  top: 0.35rem;
+  left: 0.85rem;
+  width: 1.35rem;
+  height: 1.15rem;
+  pointer-events: none;
+  user-select: none;
+  background-color: currentColor;
+  color: #94a3b8;
+  opacity: 0.7;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext x='0' y='22' font-size='28' font-weight='700' font-family='Georgia,serif'%3E%E2%80%9C%3C/text%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext x='0' y='22' font-size='28' font-weight='700' font-family='Georgia,serif'%3E%E2%80%9C%3C/text%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.umean-editor .ProseMirror blockquote > *:first-child {
+  margin-top: 0;
+}
+
+.umean-editor .ProseMirror blockquote > *:last-child {
+  margin-bottom: 0;
 }
 
 .umean-editor .ProseMirror blockquote p {
   margin: 0.35rem 0;
+}
+
+.umean-editor .ProseMirror blockquote > p:last-child:not(:only-child) {
+  margin-top: 0.6rem;
+  font-size: 0.85em;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1.45;
+  text-align: right;
+  opacity: 0.95;
 }
 
 /* Callout 提示块 */

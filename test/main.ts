@@ -29,6 +29,8 @@ const DEMO_MARKDOWN = `# 公式与流程图测试
 行内代码 \`npm test\` 与高亮 ==重点内容== （快捷键 Mod-Shift-h）。
 
 > 这是普通引用。适合摘录他人原话。
+>
+> — 《笔记与思考》
 
 > [!info]
 > 这是提示块（Callout）。Slash 搜「提示」或「警告」可插入。
