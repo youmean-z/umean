@@ -2,6 +2,8 @@
  * 可选：富文本扩展参考主题样式。
  * 用法：import 'umean/styles/rich.css'，并为编辑器容器添加 class="umean-editor"
  *
+ * 亮/暗切换：在 <html> 上设置 data-theme="light" | "dark"（默认暗色）。
+ * 代码块 / Mermaid / 块级公式始终暗色，不跟主题走。
  * 可在此基础上覆盖变量或选择器以适配你的设计系统。
  * 语法高亮需另行引入 highlight.js 主题。
  * 数学公式需引入 KaTeX CSS：import 'katex/dist/katex.min.css'
@@ -9,37 +11,197 @@
 
 @import './rich-minimal.css';
 
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --umean-bg: #0f172a;
+  --umean-surface: #1e293b;
+  --umean-surface-2: #172033;
+  --umean-text: #e2e8f0;
+  --umean-text-muted: #94a3b8;
+  --umean-heading: #f8fafc;
+  --umean-heading-2: #f1f5f9;
+  --umean-border: #334155;
+  --umean-link: #7dd3fc;
+  --umean-link-hover: #bae6fd;
+  --umean-inline-code-bg: rgba(51, 65, 85, 0.85);
+  --umean-inline-code-border: #475569;
+  --umean-inline-code-color: #e2e8f0;
+  --umean-quote-border: #64748b;
+  --umean-quote-color: #94a3b8;
+  --umean-table-border: #334155;
+  --umean-table-th-bg: #172033;
+  --umean-table-th-color: #cbd5e1;
+  --umean-table-stripe: rgba(15, 23, 42, 0.35);
+  --umean-hr: #334155;
+  --umean-highlight-bg: rgba(250, 204, 21, 0.35);
+  --umean-highlight-color: #fef9c3;
+  --umean-slash-bg: #1e293b;
+  --umean-slash-border: #334155;
+  --umean-slash-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  --umean-slash-item: #e2e8f0;
+  --umean-slash-hover: #334155;
+  --umean-slash-group: #64748b;
+  --umean-slash-thumb: #64748b;
+  --umean-slash-thumb-hover: #94a3b8;
+  --umean-find-bg: #854d0e;
+  --umean-find-color: #fef3c7;
+  --umean-find-current-bg: #f59e0b;
+  --umean-find-current-color: #1c1917;
+  --umean-handle: #64748b;
+  --umean-handle-hover-bg: rgba(51, 65, 85, 0.8);
+  --umean-handle-hover-color: #e2e8f0;
+  --umean-drop: #60a5fa;
+  --umean-placeholder: #94a3b8;
+  --umean-control-bg: #1e293b;
+  --umean-control-border: #475569;
+  --umean-control-hover: #334155;
+  --umean-input-bg: #0f172a;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --umean-bg: #f1f5f9;
+  --umean-surface: #ffffff;
+  --umean-surface-2: #f8fafc;
+  --umean-text: #0f172a;
+  --umean-text-muted: #64748b;
+  --umean-heading: #0f172a;
+  --umean-heading-2: #1e293b;
+  --umean-border: #e2e8f0;
+  --umean-link: #0369a1;
+  --umean-link-hover: #0e7490;
+  --umean-inline-code-bg: #f1f5f9;
+  --umean-inline-code-border: #e2e8f0;
+  --umean-inline-code-color: #0f172a;
+  --umean-quote-border: #94a3b8;
+  --umean-quote-color: #64748b;
+  --umean-table-border: #e2e8f0;
+  --umean-table-th-bg: #f8fafc;
+  --umean-table-th-color: #334155;
+  --umean-table-stripe: rgba(241, 245, 249, 0.9);
+  --umean-hr: #e2e8f0;
+  --umean-highlight-bg: rgba(250, 204, 21, 0.45);
+  --umean-highlight-color: inherit;
+  --umean-slash-bg: #ffffff;
+  --umean-slash-border: #e2e8f0;
+  --umean-slash-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  --umean-slash-item: #0f172a;
+  --umean-slash-hover: #e2e8f0;
+  --umean-slash-group: #94a3b8;
+  --umean-slash-thumb: #94a3b8;
+  --umean-slash-thumb-hover: #64748b;
+  --umean-find-bg: #fde68a;
+  --umean-find-color: inherit;
+  --umean-find-current-bg: #f59e0b;
+  --umean-find-current-color: #1c1917;
+  --umean-handle: #94a3b8;
+  --umean-handle-hover-bg: rgba(148, 163, 184, 0.22);
+  --umean-handle-hover-color: #475569;
+  --umean-drop: #3b82f6;
+  --umean-placeholder: #94a3b8;
+  --umean-control-bg: #ffffff;
+  --umean-control-border: #cbd5e1;
+  --umean-control-hover: #f1f5f9;
+  --umean-input-bg: #ffffff;
+}
+
+.umean-editor .ProseMirror {
+  font-family: ui-sans-serif, system-ui, 'PingFang SC', 'Noto Sans SC', sans-serif;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--umean-text);
+}
+
+.umean-editor .ProseMirror h1,
+.umean-editor .ProseMirror h2,
+.umean-editor .ProseMirror h3,
+.umean-editor .ProseMirror h4,
+.umean-editor .ProseMirror h5,
+.umean-editor .ProseMirror h6 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--umean-heading);
+}
+
+.umean-editor .ProseMirror h1 {
+  margin: 1.6em 0 0.5em;
+  font-size: 1.85rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.umean-editor .ProseMirror h2 {
+  margin: 1.4em 0 0.45em;
+  font-size: 1.35rem;
+  line-height: 1.3;
+  color: var(--umean-heading-2);
+}
+
+.umean-editor .ProseMirror h3 {
+  margin: 1.15em 0 0.35em;
+  font-size: 1.1rem;
+  line-height: 1.35;
+  color: var(--umean-text);
+}
+
+.umean-editor .ProseMirror h4,
+.umean-editor .ProseMirror h5,
+.umean-editor .ProseMirror h6 {
+  margin: 1em 0 0.3em;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.umean-editor .ProseMirror > h1:first-child,
+.umean-editor .ProseMirror > h2:first-child,
+.umean-editor .ProseMirror > h3:first-child,
+.umean-editor .ProseMirror > .umean-drag-handle:first-child + h1,
+.umean-editor .ProseMirror > .umean-drag-handle:first-child + h2,
+.umean-editor .ProseMirror > .umean-drag-handle:first-child + h3 {
+  margin-top: 0;
+}
+
+.umean-editor .ProseMirror p {
+  margin: 0.65em 0;
+}
+
+.umean-editor .ProseMirror hr {
+  background: var(--umean-hr);
+  opacity: 1;
+}
+
 .umean-editor .ProseMirror img {
   border-radius: 8px;
 }
 
 .umean-editor .ProseMirror a {
-  color: #2563eb;
+  color: var(--umean-link);
 }
 
 .umean-editor .ProseMirror a:hover {
-  color: #1d4ed8;
+  color: var(--umean-link-hover);
 }
 
 .umean-editor .ProseMirror :not(pre) > code {
-  background: rgba(51, 65, 85, 0.85);
-  border-color: #475569;
-  color: #e2e8f0;
+  background: var(--umean-inline-code-bg);
+  border-color: var(--umean-inline-code-border);
+  color: var(--umean-inline-code-color);
 }
 
 .umean-editor .ProseMirror mark,
 .umean-editor .ProseMirror .umean-highlight {
-  background: rgba(250, 204, 21, 0.35);
-  color: #fef9c3;
+  background: var(--umean-highlight-bg);
+  color: var(--umean-highlight-color);
 }
 
 .umean-editor .ProseMirror blockquote {
-  border-left-color: #64748b;
-  color: #94a3b8;
+  border-left-color: var(--umean-quote-border);
+  color: var(--umean-quote-color);
 }
 
 .umean-editor .ProseMirror .umean-callout {
-  color: #e2e8f0;
+  color: var(--umean-text);
 }
 
 .umean-editor .ProseMirror table {
@@ -48,15 +210,31 @@
 
 .umean-editor .ProseMirror th,
 .umean-editor .ProseMirror td {
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--umean-table-border);
   padding: 0.5rem 0.75rem;
 }
 
 .umean-editor .ProseMirror th {
-  background: #0f172a;
+  background: var(--umean-table-th-bg);
+  color: var(--umean-table-th-color);
   font-weight: 600;
 }
 
+.umean-editor .ProseMirror tr:nth-child(even) td {
+  background: var(--umean-table-stripe);
+}
+
+.umean-editor .ProseMirror p.is-empty::before,
+.umean-editor .ProseMirror h1.is-empty::before,
+.umean-editor .ProseMirror h2.is-empty::before,
+.umean-editor .ProseMirror h3.is-empty::before,
+.umean-editor .ProseMirror h4.is-empty::before,
+.umean-editor .ProseMirror h5.is-empty::before,
+.umean-editor .ProseMirror h6.is-empty::before {
+  color: var(--umean-placeholder);
+}
+
+/* 无 NodeView 的裸 pre 仍保持暗色代码外观 */
 .umean-editor .ProseMirror pre:not(.mermaid-source):not(.code-block-source) {
   background: #0f172a;
   color: #e2e8f0;
@@ -69,54 +247,69 @@
 }
 
 .umean-slash {
-  border-color: #334155;
-  background: #1e293b;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
-  scrollbar-color: #64748b transparent;
+  border-color: var(--umean-slash-border);
+  background: var(--umean-slash-bg);
+  box-shadow: var(--umean-slash-shadow);
+  scrollbar-color: var(--umean-slash-thumb) transparent;
 }
 
 .umean-slash::-webkit-scrollbar-thumb {
-  background: #64748b;
+  background: var(--umean-slash-thumb);
 }
 
 .umean-slash::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--umean-slash-thumb-hover);
 }
 
 .umean-slash-group {
-  color: #64748b;
+  color: var(--umean-slash-group);
 }
 
 .umean-slash-item {
-  color: #e2e8f0;
+  color: var(--umean-slash-item);
 }
 
 .umean-slash-item:hover,
 .umean-slash-item.is-active {
-  background: #334155;
+  background: var(--umean-slash-hover);
 }
 
 .umean-editor .ProseMirror .umean-find-match {
-  background: #854d0e;
-  color: #fef3c7;
+  background: var(--umean-find-bg);
+  color: var(--umean-find-color);
 }
 
 .umean-editor .ProseMirror .umean-find-match.is-current {
-  background: #f59e0b;
-  color: #1c1917;
+  background: var(--umean-find-current-bg);
+  color: var(--umean-find-current-color);
   box-shadow: 0 0 0 1px rgba(253, 230, 138, 0.5);
 }
 
 .umean-editor .ProseMirror > .umean-drag-handle {
-  color: #64748b;
+  color: var(--umean-handle);
 }
 
 .umean-editor .ProseMirror > .umean-drag-handle:hover {
-  background: rgba(51, 65, 85, 0.8);
-  color: #e2e8f0;
+  background: var(--umean-handle-hover-bg);
+  color: var(--umean-handle-hover-color);
 }
 
 .umean-block-drop-indicator {
-  background: #60a5fa;
+  background: var(--umean-drop);
   box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.35);
+}
+
+/* 代码块 / Mermaid / 块级公式：始终暗色，钉死浅色文字 */
+.umean-editor .ProseMirror .mermaid-nodeview,
+.umean-editor .ProseMirror .code-block-nodeview,
+.umean-editor .ProseMirror .block-math-nodeview {
+  --umean-panel-border: #2a3648;
+  --umean-panel-toolbar-bg: #151c2c;
+  --umean-panel-surface-bg: #111827;
+  border-radius: 10px;
+  color: #e2e8f0;
+}
+
+.umean-editor .ProseMirror .mermaid-preview {
+  padding: 1.25rem 1rem;
 }

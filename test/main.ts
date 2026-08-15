@@ -119,6 +119,7 @@ const core = createEditor({
       },
     },
     rich: {
+      mermaid: { theme: 'neutral' },
       codeBlockLanguages: [
         'js',
         'ts',
@@ -162,9 +163,40 @@ const readonlyToggleEl = document.querySelector(
 ) as HTMLInputElement | null;
 const insertTemplateBtn = document.querySelector('#btn-insert-template');
 const toggleShortcutsBtn = document.querySelector('#btn-toggle-shortcuts');
+const toggleThemeBtn = document.querySelector('#btn-toggle-theme');
 const shortcutPanelEl = document.querySelector(
   '#shortcut-panel',
 ) as HTMLElement | null;
+
+const THEME_KEY = 'umean-theme';
+
+function currentTheme(): 'light' | 'dark' {
+  return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+}
+
+function syncThemeButton(): void {
+  if (!toggleThemeBtn) {
+    return;
+  }
+  const theme = currentTheme();
+  toggleThemeBtn.textContent = theme === 'dark' ? '亮色' : '暗色';
+  toggleThemeBtn.setAttribute(
+    'aria-label',
+    theme === 'dark' ? '切换到亮色' : '切换到暗色',
+  );
+}
+
+function applyTheme(theme: 'light' | 'dark'): void {
+  document.documentElement.dataset.theme = theme;
+  try {
+    localStorage.setItem(THEME_KEY, theme);
+  } catch {
+    /* ignore quota / private mode */
+  }
+  syncThemeButton();
+}
+
+syncThemeButton();
 
 const DEMO_TEMPLATE = {
   type: 'doc' as const,
@@ -257,6 +289,10 @@ toggleShortcutsBtn?.addEventListener('click', () => {
   }
   const open = shortcutPanelEl.classList.toggle('is-open');
   shortcutPanelEl.hidden = !open;
+});
+
+toggleThemeBtn?.addEventListener('click', () => {
+  applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
 });
 
 if (jsonOutputEl) {
