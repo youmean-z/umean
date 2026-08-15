@@ -10,6 +10,10 @@
 
 功能变更见：[CHANGELOG.zh-CN.md](./CHANGELOG.zh-CN.md)
 
+写笔记、接主题 / Slash / 上传等见：[使用说明](./docs/usage.zh-CN.md)
+
+`createEditor` / `EditorCore` 方法、动作 ID、`extensionOptions` 见：[公开接口](./docs/api.zh-CN.md)
+
 ## 安装
 
 ```bash
@@ -65,6 +69,8 @@ core.destroy();
 
 ### 常用 `EditorCore` API
 
+完整方法、动作 ID、`extensionOptions` 见 [公开接口](./docs/api.zh-CN.md)。常用：
+
 ```ts
 core.insertTemplate({ type: 'paragraph', content: [{ type: 'text', text: '…' }] });
 core.getWordCount();
@@ -82,7 +88,7 @@ core.editor.commands.setFindQuery('foo');
 core.editor.commands.findNext();
 ```
 
-默认能力通过 `extensionOptions` 配置（locale、slash、upload、headingPolicy 等）。完整功能列表见 [更新日志](./CHANGELOG.zh-CN.md)。
+默认能力通过 `extensionOptions` 配置（locale、slash、upload、headingPolicy 等）。使用约定见 [使用说明](./docs/usage.zh-CN.md)，接口见 [公开接口](./docs/api.zh-CN.md)，功能列表见 [更新日志](./CHANGELOG.zh-CN.md)。
 
 ## 无头转换
 

@@ -10,6 +10,10 @@ A TipTap v3 WYSIWYG **editor core** for personal notes — Web, Electron, and Te
 
 Feature history: [CHANGELOG.md](./CHANGELOG.md)
 
+Usage (Chinese): [docs/usage.zh-CN.md](./docs/usage.zh-CN.md)
+
+Public API (Chinese): [docs/api.zh-CN.md](./docs/api.zh-CN.md)
+
 ## Install
 
 ```bash
@@ -82,7 +86,7 @@ core.editor.commands.setFindQuery('foo');
 core.editor.commands.findNext();
 ```
 
-Configure defaults via `extensionOptions` (locale, slash, upload, headingPolicy, …). Details and release notes: [CHANGELOG](./CHANGELOG.md).
+Configure defaults via `extensionOptions` (locale, slash, upload, headingPolicy, …). Usage notes (Chinese): [docs/usage.zh-CN.md](./docs/usage.zh-CN.md). API: [docs/api.zh-CN.md](./docs/api.zh-CN.md). Release notes: [CHANGELOG](./CHANGELOG.md).
 
 ## Headless transforms
 

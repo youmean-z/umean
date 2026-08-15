@@ -372,7 +372,8 @@
   margin: 0 auto;
 }
 
-/* 普通代码块 NodeView */
+/* 普通代码块 NodeView
+   语言菜单已 portal 到 body，容器保持 overflow:hidden 才能裁圆角 */
 .umean-editor .ProseMirror .code-block-nodeview {
   --umean-code-block-border: var(--umean-panel-border);
   --umean-code-block-toolbar-bg: var(--umean-panel-toolbar-bg);
@@ -384,7 +385,6 @@
 
   position: relative;
   z-index: 0;
-  overflow: visible;
 }
 
 .umean-editor .ProseMirror .code-block-nodeview.is-lang-open,
@@ -395,14 +395,11 @@
 .umean-editor .ProseMirror .code-block-toolbar {
   position: relative;
   z-index: 2;
-  overflow: visible;
 }
 
 .umean-editor .ProseMirror .code-block-source {
   position: relative;
   z-index: 1;
-  border-bottom-left-radius: 0.5rem;
-  border-bottom-right-radius: 0.5rem;
 }
 
 .umean-editor .ProseMirror .code-block-toolbar__lang {
