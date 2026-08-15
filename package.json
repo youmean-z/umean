@@ -1,6 +1,6 @@
 {
   "name": "umean",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "TipTap WYSIWYG editor core — Web, Electron & TenTap",
   "type": "module",
   "main": "./dist/index.js",
@@ -58,7 +58,15 @@
     "react-native",
     "electron"
   ],
-  "author": "",
+  "author": "youmean <zhaoyumin@youmean.cn>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://cnb.cool/youmean/share/umean/umean.git"
+  },
+  "bugs": {
+    "url": "https://cnb.cool/youmean/share/umean/umean/-/issues"
+  },
+  "homepage": "https://cnb.cool/youmean/share/umean/umean",
   "license": "MIT",
   "dependencies": {
     "@tiptap/core": "^3.0.0",
