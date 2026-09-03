@@ -17,6 +17,8 @@ export interface MermaidCodeBlockOptions {
 export interface MermaidNodeViewOptions {
   theme?: MermaidCodeBlockOptions['theme'];
   messages?: UmeanMessages;
+  /** 为 false 时不画 Web 顶栏（TenTap 用原生栏切图表 / 源码） */
+  toolbar?: boolean;
 }
 
 const _mermaidState: { initialized: boolean; theme: string } = {
@@ -44,20 +46,37 @@ async function ensureMermaidInitialized(
 }
 
 
+const activeMermaidNodeViews = new Set<MermaidNodeView>();
+
+export function findMermaidNodeViewAt(pos: number): MermaidNodeView | undefined {
+  for (const nodeView of activeMermaidNodeViews) {
+    if (!nodeView.destroyed && nodeView.matchesPos(pos)) {
+      return nodeView;
+    }
+  }
+
+  return undefined;
+}
+
+/** @internal */
+export function resetMermaidNodeViewsForTests(): void {
+  activeMermaidNodeViews.clear();
+}
+
 /**
  * 为 language=mermaid 的 codeBlock 创建 NodeView：
  * - 工具栏「图表 / 源码」切换预览与源码编辑，右侧复制按钮
  * - 空块默认源码态；已有内容默认图表预览
+ * - `toolbar: false` 时不画 Web 顶栏，供 TenTap 原生栏切换
  */
 export class MermaidNodeView implements NodeView {
   dom: HTMLElement;
   contentDOM: HTMLElement;
 
-  private toolbar: HTMLElement;
-  private tabs: HTMLElement;
-  private previewButton: HTMLButtonElement;
-  private sourceButton: HTMLButtonElement;
-  private copyButton: HTMLButtonElement;
+  private toolbar: HTMLElement | null = null;
+  private previewButton: HTMLButtonElement | null = null;
+  private sourceButton: HTMLButtonElement | null = null;
+  private copyButton: HTMLButtonElement | null = null;
   private previewDom: HTMLElement;
   private node: ProseMirrorNode;
   private view: EditorView;
@@ -66,7 +85,8 @@ export class MermaidNodeView implements NodeView {
   destroyed = false;
   private renderSeq = 0;
   private messages: UmeanMessages;
-  private copyResetTimer: { current: ReturnType<typeof setTimeout> | undefined } = { current: undefined };
+  private copyResetTimer: { current: ReturnType<typeof setTimeout> | undefined } =
+    { current: undefined };
 
   constructor(
     node: ProseMirrorNode,
@@ -85,44 +105,13 @@ export class MermaidNodeView implements NodeView {
     this.dom = document.createElement('div');
     this.dom.className = 'mermaid-nodeview';
     this.dom.draggable = false;
+    if (options.toolbar === false) {
+      this.dom.classList.add('mermaid-nodeview--tentap');
+    }
 
-    this.toolbar = document.createElement('div');
-    this.toolbar.className = 'mermaid-toolbar';
-    this.toolbar.setAttribute('contenteditable', 'false');
-
-    this.tabs = document.createElement('div');
-    this.tabs.className = 'mermaid-toolbar__tabs';
-
-    this.previewButton = document.createElement('button');
-    this.previewButton.type = 'button';
-    this.previewButton.className = 'mermaid-toolbar__button';
-    this.previewButton.textContent = this.messages.mermaidChart;
-    this.previewButton.addEventListener('mousedown', (event) => {
-      event.preventDefault();
-      this.enterPreviewMode();
-    });
-
-    this.sourceButton = document.createElement('button');
-    this.sourceButton.type = 'button';
-    this.sourceButton.className = 'mermaid-toolbar__button';
-    this.sourceButton.textContent = this.messages.source;
-    this.sourceButton.addEventListener('mousedown', (event) => {
-      event.preventDefault();
-      this.enterEditMode();
-    });
-
-    this.copyButton = document.createElement('button');
-    this.copyButton.type = 'button';
-    this.copyButton.className = 'mermaid-toolbar__button mermaid-toolbar__copy';
-    this.copyButton.textContent = this.messages.copy;
-    this.copyButton.addEventListener('mousedown', (event) => {
-      event.preventDefault();
-      void this.copySource();
-    });
-
-    this.tabs.append(this.previewButton, this.sourceButton);
-    this.toolbar.append(this.tabs, this.copyButton);
-    this.dom.appendChild(this.toolbar);
+    if (options.toolbar !== false) {
+      this.mountToolbar();
+    }
 
     const sourceDom = document.createElement('pre');
     sourceDom.className = 'mermaid-source';
@@ -135,9 +124,14 @@ export class MermaidNodeView implements NodeView {
     this.previewDom = document.createElement('div');
     this.previewDom.className = 'mermaid-preview';
     this.previewDom.setAttribute('contenteditable', 'false');
+    this.previewDom.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+      this.selectInside();
+    });
     this.dom.appendChild(this.previewDom);
 
     this.syncMode();
+    activeMermaidNodeViews.add(this);
 
     queueMicrotask(() => {
       if (this.destroyed || !this.dom.isConnected) return;
@@ -147,8 +141,17 @@ export class MermaidNodeView implements NodeView {
     });
   }
 
+  get isPreviewMode(): boolean {
+    return this.isPreview;
+  }
+
+  matchesPos(pos: number): boolean {
+    return this.getPos() === pos;
+  }
+
   update(node: ProseMirrorNode): boolean {
     if (node.type !== this.node.type) return false;
+    if (node.attrs.language !== 'mermaid') return false;
     this.node = node;
 
     if (this.isPreview) {
@@ -182,7 +185,7 @@ export class MermaidNodeView implements NodeView {
     }
 
     const target = event.target as Node;
-    if (this.toolbar.contains(target)) {
+    if (this.toolbar?.contains(target)) {
       return true;
     }
 
@@ -195,19 +198,60 @@ export class MermaidNodeView implements NodeView {
 
   destroy(): void {
     this.destroyed = true;
+    activeMermaidNodeViews.delete(this);
     if (this.copyResetTimer.current) {
       clearTimeout(this.copyResetTimer.current);
     }
   }
 
+  private mountToolbar(): void {
+    this.toolbar = document.createElement('div');
+    this.toolbar.className = 'mermaid-toolbar';
+    this.toolbar.setAttribute('contenteditable', 'false');
+
+    const tabs = document.createElement('div');
+    tabs.className = 'mermaid-toolbar__tabs';
+
+    this.previewButton = document.createElement('button');
+    this.previewButton.type = 'button';
+    this.previewButton.className = 'mermaid-toolbar__button';
+    this.previewButton.textContent = this.messages.mermaidChart;
+    this.previewButton.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+      this.enterPreviewMode();
+    });
+
+    this.sourceButton = document.createElement('button');
+    this.sourceButton.type = 'button';
+    this.sourceButton.className = 'mermaid-toolbar__button';
+    this.sourceButton.textContent = this.messages.source;
+    this.sourceButton.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+      this.enterEditMode();
+    });
+
+    this.copyButton = document.createElement('button');
+    this.copyButton.type = 'button';
+    this.copyButton.className = 'mermaid-toolbar__button mermaid-toolbar__copy';
+    this.copyButton.textContent = this.messages.copy;
+    this.copyButton.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+      void this.copySource();
+    });
+
+    tabs.append(this.previewButton, this.sourceButton);
+    this.toolbar.append(tabs, this.copyButton);
+    this.dom.appendChild(this.toolbar);
+  }
+
   private syncMode(): void {
     this.dom.classList.toggle('mermaid-nodeview--preview', this.isPreview);
     this.dom.classList.toggle('mermaid-nodeview--code', !this.isPreview);
-    this.previewButton.setAttribute('aria-pressed', String(this.isPreview));
-    this.sourceButton.setAttribute('aria-pressed', String(!this.isPreview));
+    this.previewButton?.setAttribute('aria-pressed', String(this.isPreview));
+    this.sourceButton?.setAttribute('aria-pressed', String(!this.isPreview));
   }
 
-  private enterEditMode(): void {
+  enterEditMode(): void {
     if (!this.isPreview) {
       this.focusSource();
       return;
@@ -226,11 +270,18 @@ export class MermaidNodeView implements NodeView {
     this.renderPreview();
   }
 
+  private selectInside(): void {
+    const pos = this.getPos();
+    if (pos == null) return;
+    focusProseMirrorNodeEnd(this.view, this.node, this.getPos);
+  }
+
   private focusSource(): void {
     focusProseMirrorNodeEnd(this.view, this.node, this.getPos);
   }
 
   private async copySource(): Promise<void> {
+    if (!this.copyButton) return;
     await copyToClipboard(
       this.node.textContent,
       this.copyButton,

@@ -1,5 +1,32 @@
 # 更新日志
 
+## Unreleased
+
+### 变更
+
+- TenTap 补充扩展默认不挂块拖拽手柄（触屏不可用）；需手柄时传 `blockDragHandle: {}`
+- TenTap `TableBridge` 关闭列宽拖拽（`resizable: false`）
+- `tentap-demo`：点编辑区再弹键盘；顶栏改为笔记壳；Android `softwareKeyboardLayoutMode: resize`
+- `tentap-demo`：键盘上方格式栏；标题与插入在栏内切换（不弹系统面板，避免抢焦点收键盘）；主栏含撤销/重做
+- `tentap-demo`：主栏标题用「正 / H2 / H3」（笔记标题为「题」）；拍/图在主栏，链接与列表放进 +
+- TenTap WebView：`.ProseMirror` 使用 `box-sizing: border-box`，避免空笔记也能上下滚
+- TenTap 表格补单元格边框；光标在表内时工具栏提供加行/列、删行/列、删表，以及当前格左/中/右对齐（默认左）
+
+### 修复
+
+- `tentap-demo`：iOS / Android Expo 键盘弹出时把编辑区收到键盘上方（边到边时窗口不会缩小），长笔记不再被挡住；格式栏改为占位而不是叠在 WebView 上
+- TenTap 插图后补空段落，光标不再停在图片上
+- TenTap 链接：输入 URL 不再弄丢选区（避免在正文里新插一条链）；确定后光标在链后，后续输入不再带链；「关」可退出链接栏
+- 图后内容删光仍能继续写：文末补段落；图后空段 / 选中图片时接管换行（含手机回车）；插图不再叠出多余空行
+
+### 新增
+
+- `tentap-demo`：主栏「拍 / 图」打开系统相机或相册，经 `ImageBridge.setImage` 写入（data URI）；插图后补空段落，光标在图下
+- TenTap：链接在格式栏内填 URL（先记下选区再填，确定给选区加链；空选区插入链接文字）；代码块内栏上选语言（JS/TS/HTML/CSS/MD/纯）
+- TenTap：插入栏「线」插入分割线，光标在线下空段；线仍是 1px，点击区域加高，上下间距与原先 1.5rem 对齐
+- TenTap：插入栏「示」插入提示块，栏内切换信/示/警/危，「解」取消包裹
+- TenTap：插入栏「行 / 块」在格式栏内填 LaTeX（块级用多行输入）；点已有公式可改；「流」插入 Mermaid 并显示图表预览，栏上「图 / 码」切换预览与源码
+
 ## 0.2.0
 
 个人笔记向编辑器核心能力补齐：Slash / Callout / i18n、查找替换、脏状态、目录、块拖拽，以及宿主常用 API（模板、字数、只读、快捷键表）。

@@ -1,0 +1,22 @@
+{
+  "extends": "./node_modules/expo/tsconfig.base.json",
+  "compilerOptions": {
+    "strict": true,
+    "ignoreDeprecations": "6.0",
+    "baseUrl": ".",
+    "paths": {
+      "@10play/tentap-editor": ["./node_modules/@10play/tentap-editor"],
+      "@10play/tentap-editor/*": ["./node_modules/@10play/tentap-editor/*"],
+      "@tiptap/core": ["./node_modules/@tiptap/core"],
+      "@tiptap/pm": ["./node_modules/@tiptap/pm"],
+      "@tiptap/pm/*": ["./node_modules/@tiptap/pm/*"],
+      "prosemirror-view": ["./node_modules/prosemirror-view"],
+      "prosemirror-model": ["./node_modules/prosemirror-model"],
+      "prosemirror-state": ["./node_modules/prosemirror-state"],
+      "prosemirror-transform": ["./node_modules/prosemirror-transform"],
+      "prosemirror-keymap": ["./node_modules/prosemirror-keymap"],
+      "react-native-webview": ["./node_modules/react-native-webview"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"]
+}

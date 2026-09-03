@@ -111,12 +111,22 @@ npm run editor:build
 ```
 
 ```tsx
-import { RichText } from '@10play/tentap-editor';
+import { RichText, Toolbar, useEditorBridge } from '@10play/tentap-editor';
 import { editorHtml } from 'umean/tentap/editor-html';
 import { createTenTapBridges } from 'umean/tentap';
 
-<RichText editorHtml={editorHtml} bridgeExtensions={createTenTapBridges()} />
+const editor = useEditorBridge({
+  customSource: editorHtml,
+  bridgeExtensions: createTenTapBridges(),
+  autofocus: false,
+  avoidIosKeyboard: true,
+});
+
+<RichText editor={editor} />
+<Toolbar editor={editor} />
 ```
+
+Simulator / device smoke demo: [`examples/tentap-demo`](./examples/tentap-demo) (`npm run demo:tentap`).
 
 ## Development
 
@@ -126,6 +136,7 @@ npm run typecheck
 npm test
 npm run build
 npm run test:dev   # http://localhost:5173/test/
+npm run demo:tentap  # Expo TenTap demo (needs editor:build)
 ```
 
 ## License

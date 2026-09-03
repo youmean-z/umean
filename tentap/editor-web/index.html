@@ -8,11 +8,19 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/katex.min.css"
+    />
     <link rel="stylesheet" href="../../styles/rich-minimal.css" />
     <style>
-      body {
+      html,
+      body,
+      #root {
+        height: 100%;
         margin: 0;
         padding: 0;
+        overflow: hidden;
       }
 
       #root > div:nth-of-type(1) {
@@ -22,6 +30,7 @@
         width: 100%;
         top: 0;
         bottom: 0;
+        overscroll-behavior: contain;
       }
 
       #root > div.dynamic-height {
@@ -29,6 +38,7 @@
       }
 
       #root div .ProseMirror {
+        box-sizing: border-box;
         min-height: 100%;
         overflow: visible;
         outline: none;

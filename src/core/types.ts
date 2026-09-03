@@ -122,7 +122,8 @@ export interface DefaultExtensionsOptions {
    */
   dirtyState?: DirtyStateOptions | false;
   /**
-   * 顶层块左侧拖拽手柄。默认启用；`false` 关闭。
+   * 顶层块左侧拖拽手柄。Web 默认启用；`false` 关闭。
+   * TenTap 补充扩展默认不挂，需显式传配置对象（如 `{}`）。
    * 仅手柄可拖；公式/代码/Mermaid 等 NodeView 已禁用整块原生拖拽。
    */
   blockDragHandle?: BlockDragHandleOptions | false;

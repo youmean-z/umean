@@ -66,6 +66,13 @@ export {
 } from './extensions/callout';
 export { BlockquoteKeys } from './extensions/blockquoteKeys';
 export {
+  TrailingParagraph,
+  trailingParagraphPluginKey,
+  breakAfterBlockAtom,
+  needsTrailingParagraph,
+  isBlockAtom,
+} from './extensions/trailingParagraph';
+export {
   LinkExit,
   exitLinkStoredMark,
   isAtEndOfLink,
@@ -92,6 +99,7 @@ export {
 } from './utils/headingPolicyUtils';
 export {
   parseAlignSuffix,
+  normalizeTableAlign,
   applyAlignToTable,
   findCellAtPos,
   type TableAlign,

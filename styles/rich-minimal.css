@@ -155,9 +155,14 @@
 
 .umean-editor .ProseMirror hr {
   border: 0;
-  height: 1px;
-  margin: 1.5rem 0;
-  background: currentColor;
+  height: 28px;
+  margin: calc(1.5rem - 14px) 0;
+  padding: 0;
+  background-color: transparent;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+  background-position: center;
   opacity: 0.2;
 }
 
@@ -185,13 +190,21 @@
   border-collapse: collapse;
   width: 100%;
   table-layout: fixed;
+  margin: 0.75rem 0;
 }
 
 .umean-editor .ProseMirror th,
 .umean-editor .ProseMirror td {
+  border: 1px solid #cbd5e1;
+  padding: 0.4rem 0.5rem;
   vertical-align: top;
   word-break: break-word;
   overflow-wrap: anywhere;
+}
+
+.umean-editor .ProseMirror th {
+  background: #f8fafc;
+  font-weight: 600;
 }
 
 .umean-editor .ProseMirror pre {
@@ -342,6 +355,10 @@
   cursor: default;
   user-select: none;
   pointer-events: none;
+}
+
+.umean-editor .ProseMirror .mermaid-nodeview--tentap .mermaid-preview {
+  pointer-events: auto;
 }
 
 /* Mermaid 流程图 NodeView */

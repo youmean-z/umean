@@ -1,5 +1,32 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- TenTap supplemental extensions no longer register the block drag handle by default (pass `blockDragHandle: {}` to enable)
+- TenTap `TableBridge` uses `resizable: false` (column drag is not usable on touch)
+- `tentap-demo`: focus the editor to show the keyboard; note-like chrome; Android `softwareKeyboardLayoutMode: resize`
+- `tentap-demo`: keyboard accessory toolbar; heading and insert switch in-bar (no system sheets, so the keyboard stays up); main bar includes undo/redo
+- `tentap-demo`: heading control is 「正 / H2 / H3」(note title shows 「题」); camera/library sit on the main bar; link and lists move under +
+- TenTap WebView: `.ProseMirror` uses `box-sizing: border-box` so an empty note no longer overscrolls
+- TenTap tables draw cell borders; in-table toolbar can add/delete rows and columns, delete the table, or align the current cell (left by default)
+
+### Fixed
+
+- `tentap-demo`: shrink the editor above the keyboard on iOS and Android Expo (edge-to-edge does not resize the window); format bar sits in layout instead of overlaying the WebView
+- TenTap image insert leaves the caret in a paragraph below the image
+- TenTap links: typing a URL no longer drops the selection (so confirm wraps text instead of inserting a new URL); the caret leaves the link after confirm; 「关」 closes the link bar
+- After deleting everything below an image, typing and Enter still work: a trailing paragraph is restored; Enter / mobile `insertParagraph` after an image is handled; inserting an image no longer adds an extra blank line
+
+### Added
+
+- `tentap-demo`: 「拍 / 图」 on the main bar opens the camera or photo library and inserts via `ImageBridge.setImage` (data URI); a paragraph is added after the image so typing can continue
+- TenTap: link URL is typed in the format bar (selection is snapshotted first, confirm wraps it; empty selection inserts linked text); in a code block the bar picks JS/TS/HTML/CSS/MD/plain
+- TenTap: insert bar 「线」 inserts a horizontal rule and leaves the caret in the paragraph below; the rule stays 1px visually with a taller tap target, and vertical spacing matches the original 1.5rem
+- TenTap: insert bar 「示」 inserts a callout; the bar switches info/tip/warning/danger; 「解」 unwraps
+- TenTap: insert bar 「行 / 块」 types LaTeX in the format bar (block uses a taller multiline field); tap a formula to edit; 「流」 inserts Mermaid and shows a chart preview; native bar 「图 / 码」 switches preview and source
+
 ## 0.2.0
 
 Personal-notes editor core: slash/callout/i18n, find-replace, dirty state, TOC, block drag handles, and host-facing helpers (template, word count, readonly, shortcut list).

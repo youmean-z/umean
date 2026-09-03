@@ -18,6 +18,14 @@ export function parseAlignSuffix(suffix?: string): TableAlign | null {
   return ALIGN_SUFFIX_MAP[suffix] ?? null;
 }
 
+export function normalizeTableAlign(value: unknown): TableAlign | null {
+  if (value === 'left' || value === 'center' || value === 'right') {
+    return value;
+  }
+
+  return null;
+}
+
 export function applyAlignToTable(
   tr: Transaction,
   tablePos: number,

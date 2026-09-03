@@ -13,12 +13,16 @@ export interface TenTapTiptapOptions {
 /**
  * TenTap WebView 侧 TipTap 配置。
  * 基础格式与富媒体由 Bridge 提供；此处追加与 Web 对齐的补充扩展。
+ * 默认不挂块拖拽手柄；需手柄时传 `blockDragHandle: {}`。
  */
 export function createTenTapTiptapOptions(
   options: DefaultExtensionsOptions = {},
 ): TenTapTiptapOptions {
   return {
-    extensions: createTenTapSupplementalExtensions(options),
+    extensions: createTenTapSupplementalExtensions({
+      ...options,
+      blockDragHandle: options.blockDragHandle ?? false,
+    }),
     editorProps: {
       attributes: {
         spellcheck: 'false',
@@ -32,6 +36,26 @@ export {
   TableBridge,
   TableEditorActionType,
 } from './bridges/tableBridge';
+export {
+  ImageBridge,
+  ImageEditorActionType,
+} from './bridges/imageBridge';
+export {
+  HorizontalRuleBridge,
+  HorizontalRuleEditorActionType,
+} from './bridges/horizontalRuleBridge';
+export {
+  CalloutBridge,
+  CalloutEditorActionType,
+} from './bridges/calloutBridge';
+export {
+  MathBridge,
+  MathEditorActionType,
+} from './bridges/mathBridge';
+export {
+  LinkBridge,
+  LinkEditorActionType,
+} from './bridges/linkBridge';
 export {
   CodeBlockBridge,
   CodeBlockEditorActionType,

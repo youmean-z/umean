@@ -26,6 +26,7 @@ import { createRichExtensions } from './richExtensions';
 import { SlashCommand } from './slashCommand';
 import { TableAlignShortcut } from './tableAlignShortcut';
 import { TableShortcut } from './tableShortcut';
+import { TrailingParagraph } from './trailingParagraph';
 
 function resolveHeadingPolicyMode(
   options: DefaultExtensionsOptions,
@@ -104,6 +105,7 @@ function isTableShortcutsEnabled(options: DefaultExtensionsOptions): boolean {
 /**
  * TenTap WebView 补充扩展：Bridge 未覆盖的 Markdown、剪贴板、表格快捷键与标题策略。
  * Image / TaskList / Table / CodeBlock 等由 Bridge 提供，勿在此重复注册。
+ * 默认不挂块拖拽手柄（触屏不可用）；需手柄时传 `blockDragHandle: {}`。
  */
 export function createTenTapSupplementalExtensions(
   options: DefaultExtensionsOptions = {},
@@ -112,6 +114,11 @@ export function createTenTapSupplementalExtensions(
 
   appendMarkdownExtensions(extensions, options);
   extensions.push(BlockquoteKeys);
+  extensions.push(TrailingParagraph);
+
+  if (options.link !== false) {
+    extensions.push(LinkExit);
+  }
 
   if (isTableShortcutsEnabled(options)) {
     extensions.push(TableShortcut, TableAlignShortcut);
@@ -133,12 +140,8 @@ export function createTenTapSupplementalExtensions(
     );
   }
 
-  if (options.blockDragHandle !== false) {
-    extensions.push(
-      options.blockDragHandle
-        ? BlockDragHandle.configure(options.blockDragHandle)
-        : BlockDragHandle,
-    );
+  if (options.blockDragHandle) {
+    extensions.push(BlockDragHandle.configure(options.blockDragHandle));
   }
 
   appendPolicyExtensions(extensions, options);
@@ -171,6 +174,7 @@ export function createDefaultExtensions(
 
     extensions.push(StarterKit.configure(starterKitOptions));
     extensions.push(BlockquoteKeys);
+    extensions.push(TrailingParagraph);
 
     if (starterKitOptions.link !== false) {
       extensions.push(LinkExit);

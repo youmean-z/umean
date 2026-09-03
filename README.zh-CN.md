@@ -113,12 +113,22 @@ npm run editor:build
 ```
 
 ```tsx
-import { RichText } from '@10play/tentap-editor';
+import { RichText, Toolbar, useEditorBridge } from '@10play/tentap-editor';
 import { editorHtml } from 'umean/tentap/editor-html';
 import { createTenTapBridges } from 'umean/tentap';
 
-<RichText editorHtml={editorHtml} bridgeExtensions={createTenTapBridges()} />
+const editor = useEditorBridge({
+  customSource: editorHtml,
+  bridgeExtensions: createTenTapBridges(),
+  autofocus: false,
+  avoidIosKeyboard: true,
+});
+
+<RichText editor={editor} />
+<Toolbar editor={editor} />
 ```
+
+真机 / 模拟器冒烟示例：[`examples/tentap-demo`](./examples/tentap-demo)（`npm run demo:tentap`）。
 
 ## 开发
 
@@ -128,6 +138,7 @@ npm run typecheck
 npm test
 npm run build
 npm run test:dev   # http://localhost:5173/test/
+npm run demo:tentap  # Expo TenTap 示例（会先 editor:build）
 ```
 
 ## License

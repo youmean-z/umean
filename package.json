@@ -46,6 +46,7 @@
     "test:open": "npm run build && npm run build:test && serve . -l 5173",
     "editor:dev": "vite --config tentap/editor-web/vite.config.ts",
     "editor:build": "vite --config tentap/editor-web/vite.config.ts build && node tentap/scripts/post-build.mjs",
+    "demo:tentap": "npm run editor:build && npm --prefix examples/tentap-demo start",
     "prepublishOnly": "npm run typecheck && npm test && npm run build && npm run editor:build"
   },
   "keywords": [
@@ -73,6 +74,7 @@
     "@tiptap/extension-code-block-lowlight": "^3.27.3",
     "@tiptap/extension-image": "^3.27.3",
     "@tiptap/extension-highlight": "^3.27.3",
+    "@tiptap/extension-horizontal-rule": "^3.27.3",
     "@tiptap/extension-link": "^3.27.3",
     "@tiptap/extension-mathematics": "^3.27.3",
     "@tiptap/extension-placeholder": "^3.27.3",

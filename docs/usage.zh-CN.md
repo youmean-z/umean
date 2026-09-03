@@ -176,7 +176,9 @@ extensionOptions: {
 
 ## TenTap
 
-Schema / JSON / 参考样式尽量共用。手机操作应另做（底部栏、长按、系统相册），不要搬 Slash 和拖拽手柄。TenTap 目前能力少于 Web（Callout、公式、Mermaid、Slash 等未全接）。
+Schema / JSON / 参考样式尽量共用。手机操作应另做（底部栏、长按、系统相册），不要搬 Slash 和拖拽手柄。`createTenTapTiptapOptions()` / 补充扩展默认不挂手柄；表格列宽拖拽默认关闭。TenTap 目前能力少于 Web（Slash、查找等未全接）。
+
+宿主侧用 `useEditorBridge({ customSource: editorHtml, bridgeExtensions: createTenTapBridges() })`，不要把 `editorHtml` 传给 `RichText`。建议 `autofocus: false`，点编辑区再弹键盘。插入块用键盘上方工具栏内切换（标题 / +），不要弹系统 ActionSheet，也不要在 WebView 里接 Slash。插图走主栏「拍 / 图」（`ImageBridge.setImage`），不要用 Slash。链接在 + 里填 URL，不要弹系统输入框；点链接时先记下选区再聚焦输入框，确定给选区加链，加完光标在链后（不再带链），「关」退回主栏。标题用栏内「正 / H2 / H3」（笔记标题为「题」），不要用过大的 A 图标。代码块语言也在栏内选。分割线用插入栏「线」（`HorizontalRuleBridge.setHorizontalRule`）。提示块用插入栏「示」（`CalloutBridge.insertCallout`），栏内切换类型，不要弹系统面板。公式用插入栏「行 / 块」（`MathBridge.applyMath`），栏内填 LaTeX，不要弹系统输入框；块级用多行输入，点已有公式会带出源码。流程图用插入栏「流」（`insertMermaid`），默认显示图表，栏上「图 / 码」切换预览与源码（`setMermaidPreview`），不要用 Web 顶栏按钮。图后内容删光后仍可继续输入和换行（文末会补空段落）。键盘弹出时让编辑区随键盘缩小（不要只给 WebView 加 padding），长笔记才不会被挡住。真机 / 模拟器冒烟见 [`examples/tentap-demo`](../examples/tentap-demo)。
 
 ## 相关
 

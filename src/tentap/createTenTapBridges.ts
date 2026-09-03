@@ -1,11 +1,12 @@
-import {
-  HeadingBridge,
-  PlaceholderBridge,
-  TenTapStartKit,
-} from '@10play/tentap-editor';
+import { HeadingBridge, PlaceholderBridge, TenTapStartKit } from '@10play/tentap-editor';
 
 import type { HeadingPolicyOptions, CodeBlockLanguageInput } from '../core/types';
+import { CalloutBridge } from './bridges/calloutBridge';
 import { createCodeBlockBridge } from './bridges/codeBlockBridge';
+import { HorizontalRuleBridge } from './bridges/horizontalRuleBridge';
+import { ImageBridge } from './bridges/imageBridge';
+import { LinkBridge } from './bridges/linkBridge';
+import { MathBridge } from './bridges/mathBridge';
 import { TableBridge } from './bridges/tableBridge';
 
 export interface TenTapBridgesOptions {
@@ -28,6 +29,12 @@ export function createTenTapBridges(options: TenTapBridgesOptions = {}) {
     bridges = bridges.filter((bridge) => bridge !== PlaceholderBridge);
   }
 
+  // 换成会在图后补空段落的 ImageBridge，避免选区停在图片上
+  bridges = bridges.filter((bridge) => bridge.name !== 'image');
+  // 换成空选区也能插入链接的 LinkBridge，栏内填 URL
+  bridges = bridges.filter((bridge) => bridge.name !== 'link');
+  bridges = bridges.filter((bridge) => bridge.name !== 'horizontalRule');
+
   if (headingPolicyMode === 'chunk') {
     bridges = bridges.map((bridge) =>
       bridge === HeadingBridge
@@ -40,5 +47,10 @@ export function createTenTapBridges(options: TenTapBridgesOptions = {}) {
     ...bridges,
     TableBridge,
     createCodeBlockBridge({ languages: options.codeBlockLanguages }),
+    ImageBridge,
+    LinkBridge,
+    HorizontalRuleBridge,
+    CalloutBridge,
+    MathBridge,
   ];
 }

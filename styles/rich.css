@@ -175,7 +175,14 @@
 }
 
 .umean-editor .ProseMirror hr {
-  background: var(--umean-hr);
+  height: 28px;
+  margin: calc(1.5rem - 14px) 0;
+  padding: 0;
+  background-color: transparent;
+  background-image: linear-gradient(var(--umean-hr), var(--umean-hr));
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+  background-position: center;
   opacity: 1;
 }
 
