@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.3.0
+
+TenTap 手机端可以写笔记：键盘上方格式栏、系统相机/相册、公式、Mermaid 预览、提示块、分割线。Web 的 Schema 与宿主 API 相对 0.2.0 没有大改。
+
 ### 变更
 
 - TenTap 补充扩展默认不挂块拖拽手柄（触屏不可用）；需手柄时传 `blockDragHandle: {}`

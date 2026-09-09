@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.3.0
+
+TenTap can actually take notes on a phone: keyboard accessory bar, camera/library, math, Mermaid preview, callout, and horizontal rule. Web schema and host APIs are unchanged from 0.2.0.
+
 ### Changed
 
 - TenTap supplemental extensions no longer register the block drag handle by default (pass `blockDragHandle: {}` to enable)
