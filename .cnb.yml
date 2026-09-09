@@ -11,6 +11,40 @@ main:
         - name: test
           script: npm test
 
+    # 密钥：https://cnb.cool/youmean/share/git-secrets 内 Web 编辑 git-sync.yml
+    # 文件内容示例：
+    #
+    # allow_slugs:
+    #   - youmean/share/umean/umean
+    # allow_branches:
+    #   - main
+    # GITHUB_USERNAME: youmean-z
+    # GITHUB_TOKEN: ghp_xxx
+    # GITEE_USERNAME: youmean-z
+    # GITEE_TOKEN: xxx
+    - name: sync
+      imports:
+        - https://cnb.cool/youmean/share/git-secrets/-/blob/main/git-sync.yml
+      stages:
+        - name: sync to github
+          image: tencentcom/git-sync
+          settings:
+            target_url: https://github.com/youmean-z/umean.git
+            auth_type: https
+            username: ${GITHUB_USERNAME}
+            password: ${GITHUB_TOKEN}
+            branch: main
+            push_tags: true
+        - name: sync to gitee
+          image: tencentcom/git-sync
+          settings:
+            target_url: https://gitee.com/youmean-z/umean.git
+            auth_type: https
+            username: ${GITEE_USERNAME}
+            password: ${GITEE_TOKEN}
+            branch: main
+            push_tags: true
+
   pull_request:
     - name: pr-check
       docker:
