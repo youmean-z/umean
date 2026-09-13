@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.3.2
+
+### Fixed
+
+- TenTap: `createTenTapBridges({ headingPolicy, codeBlockLanguages })` is injected into the WebView via `umeanConfig`, so `document` actually locks the first-line H1 and custom code-block languages apply (previously RN-only)
+
 ## 0.3.1
 
 ### Changed

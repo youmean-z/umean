@@ -6,15 +6,28 @@ vi.mock('@10play/tentap-editor', () => {
   class BridgeExtension {
     forceName: string;
     tiptapExtension: any;
+    config?: unknown;
     [key: string]: any;
 
     constructor(opts: Record<string, any>) {
       Object.assign(this, opts);
       this.forceName = opts.forceName ?? opts.name;
+      this.name = opts.forceName ?? opts.name ?? this.tiptapExtension?.name;
     }
 
     configureExtension(config: any): BridgeExtension {
-      return new BridgeExtension({ ...this, ...config });
+      const cloned = new BridgeExtension({
+        forceName: this.forceName,
+        name: this.name,
+        tiptapExtension: this.tiptapExtension,
+        extendEditorInstance: this.extendEditorInstance,
+        extendEditorState: this.extendEditorState,
+        onBridgeMessage: this.onBridgeMessage,
+        extendCSS: this.extendCSS,
+        tiptapExtensionDeps: this.tiptapExtensionDeps,
+      });
+      cloned.config = config;
+      return cloned;
     }
   }
 
@@ -67,6 +80,7 @@ describe('createTenTapBridges', () => {
     expect(names).toContain('horizontalRuleBridge');
     expect(names).toContain('calloutBridge');
     expect(names).toContain('mathBridge');
+    expect(names).toContain('umeanConfig');
   });
 
   it('exposes link apply and code language actions', () => {
@@ -198,10 +212,36 @@ describe('createTenTapBridges', () => {
     });
   });
 
+  it('injects umeanConfig with headingPolicy and codeBlockLanguages', () => {
+    const bridges = createTenTapBridges({
+      headingPolicy: {
+        mode: 'document',
+        placeholderTitle: '题',
+      },
+      codeBlockLanguages: ['js', 'ts'],
+    });
+    const configBridge = bridges.find((b: any) => b.forceName === 'umeanConfig');
+    expect(configBridge?.config).toEqual({
+      headingPolicy: {
+        mode: 'document',
+        placeholderTitle: '题',
+        placeholderContent: undefined,
+      },
+      codeBlockLanguages: ['js', 'ts'],
+    });
+  });
+
   it('headingPolicy: false keeps PlaceholderBridge', () => {
     const defaultBridges = createTenTapBridges();
     const noPolicyBridges = createTenTapBridges({ headingPolicy: false });
     expect(noPolicyBridges.length).toBe(defaultBridges.length + 1);
+    const configBridge = noPolicyBridges.find(
+      (b: any) => b.forceName === 'umeanConfig',
+    );
+    expect(configBridge?.config).toEqual({
+      headingPolicy: false,
+      codeBlockLanguages: undefined,
+    });
   });
 
   it('chunk mode produces bridges without crashing', () => {

@@ -33,6 +33,13 @@ export function createTenTapTiptapOptions(
 
 export { createTenTapBridges, type TenTapBridgesOptions } from './createTenTapBridges';
 export {
+  resolveTenTapExtensionOptions,
+  type ResolveTenTapExtensionOptionsInput,
+  type UmeanConfigBridgeConfig,
+} from './resolveTenTapExtensionOptions';
+export { UMEAN_CONFIG_BRIDGE_NAME } from './umeanConfigName';
+export { UmeanConfigBridge } from './bridges/umeanConfigBridge';
+export {
   TableBridge,
   TableEditorActionType,
 } from './bridges/tableBridge';

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.3.2
+
+### 修复
+
+- TenTap：`createTenTapBridges({ headingPolicy, codeBlockLanguages })` 经 `umeanConfig` 注入 WebView，`document` 会真正固定首行 H1；自定义代码块语言也会生效（此前只作用在 RN 侧）
+
 ## 0.3.1
 
 ### 变更

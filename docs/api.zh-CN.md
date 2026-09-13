@@ -198,10 +198,12 @@ import { createTenTapBridges } from 'umean/tentap';
 import { editorHtml } from 'umean/tentap/editor-html';
 
 createTenTapBridges({
-  headingPolicy: { mode: 'free' },
+  headingPolicy: { mode: 'document' }, // free | document | chunk
   codeBlockLanguages: ['js', 'ts'],
 });
 ```
+
+`headingPolicy` / `codeBlockLanguages` 经 `umeanConfig` bridge 注入 WebView（`bridgeExtensionConfigMap`），与 `createTenTapTiptapOptions` 对齐；只改 RN 侧即可，不必拼 `?mode=`（DEV 仍可用 URL 覆盖 mode）。
 
 WebView 侧用 `createTenTapTiptapOptions()`。默认不挂块拖拽手柄（`blockDragHandle: {}` 才启用）；表格 `resizable: false`，`TableBridge` 提供插入/删表、加减行列、当前格对齐（`setCellAlign`，默认左）。图片由 umean `ImageBridge`（`setImage`）提供：插入后补空段落，光标在图下；手机端主栏「拍 / 图」走系统相机或相册（data URI）。文末若停在图片/表格/分割线/块级公式上会自动再补一段，图后空段回车（含手机 `beforeinput`）也能新起一行。分割线用 `HorizontalRuleBridge.setHorizontalRule`（插入栏「线」）。提示块用 `CalloutBridge.insertCallout` / `updateCalloutType` / `unsetCallout`（插入栏「示」，栏内选信/示/警/危）。链接用 `LinkBridge.setLink(href, range?)`（栏内填 URL；原生侧会先记下选区，避免输入框抢焦点后变成新插一条链）。代码块 `setCodeBlockLanguage` 在栏内选语言。公式用 `MathBridge.applyMath(latex, kind, range?)`（插入栏「行 / 块」，栏内填 LaTeX）。Mermaid 用 `insertMermaid` / `setMermaidPreview`（插入栏「流」，栏内「图 / 码」切预览与源码）。能力少于 Web，见使用说明。
 

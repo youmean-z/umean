@@ -8,6 +8,7 @@ import { ImageBridge } from './bridges/imageBridge';
 import { LinkBridge } from './bridges/linkBridge';
 import { MathBridge } from './bridges/mathBridge';
 import { TableBridge } from './bridges/tableBridge';
+import { UmeanConfigBridge } from './bridges/umeanConfigBridge';
 
 export interface TenTapBridgesOptions {
   /** 与 Web 一致的标题策略；`false` 时保留 TenTap 内置 PlaceholderBridge */
@@ -43,6 +44,15 @@ export function createTenTapBridges(options: TenTapBridgesOptions = {}) {
     );
   }
 
+  const headingPolicyConfig: HeadingPolicyOptions | false =
+    options.headingPolicy === false
+      ? false
+      : {
+          mode: options.headingPolicy?.mode ?? 'free',
+          placeholderTitle: options.headingPolicy?.placeholderTitle,
+          placeholderContent: options.headingPolicy?.placeholderContent,
+        };
+
   return [
     ...bridges,
     TableBridge,
@@ -52,5 +62,10 @@ export function createTenTapBridges(options: TenTapBridgesOptions = {}) {
     HorizontalRuleBridge,
     CalloutBridge,
     MathBridge,
+    // RN → WebView：经 bridgeExtensionConfigMap 注入 headingPolicy / codeBlockLanguages
+    UmeanConfigBridge.configureExtension({
+      headingPolicy: headingPolicyConfig,
+      codeBlockLanguages: options.codeBlockLanguages,
+    }),
   ];
 }

@@ -2,24 +2,23 @@ import React from 'react';
 import { EditorContent } from '@tiptap/react';
 import { useTenTap } from '@10play/tentap-editor';
 
-import type { HeadingPolicyMode } from '../../src/core/types.ts';
 import {
   createTenTapBridges,
   createTenTapTiptapOptions,
 } from '../../src/tentap/index.ts';
+import { resolveTenTapExtensionOptions } from '../../src/tentap/resolveTenTapExtensionOptions.ts';
 
-function resolveHeadingPolicyMode(): HeadingPolicyMode {
-  const mode = new URLSearchParams(window.location.search).get('mode');
-  if (mode === 'document' || mode === 'chunk' || mode === 'free') {
-    return mode;
+declare global {
+  interface Window {
+    bridgeExtensionConfigMap?: string;
+    dynamicHeight?: boolean;
   }
-
-  return 'free';
 }
 
-const extensionOptions = {
-  headingPolicy: { mode: resolveHeadingPolicyMode() },
-};
+const extensionOptions = resolveTenTapExtensionOptions({
+  search: window.location.search,
+  bridgeExtensionConfigMap: window.bridgeExtensionConfigMap,
+});
 
 export function AdvancedEditor() {
   const editor = useTenTap({
