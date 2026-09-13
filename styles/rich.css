@@ -2,7 +2,7 @@
  * 可选：富文本扩展参考主题样式。
  * 用法：import 'umean/styles/rich.css'，并为编辑器容器添加 class="umean-editor"
  *
- * 亮/暗切换：在 <html> 上设置 data-theme="light" | "dark"（默认暗色）。
+ * 亮/暗切换：在 <html> 上设置 data-theme="light" | "dark"（默认亮色）。
  * 代码块 / Mermaid / 块级公式始终暗色，不跟主题走。
  * 可在此基础上覆盖变量或选择器以适配你的设计系统。
  * 语法高亮需另行引入 highlight.js 主题。
@@ -12,57 +12,6 @@
 @import './rich-minimal.css';
 
 :root,
-:root[data-theme='dark'] {
-  color-scheme: dark;
-  --umean-bg: #0f172a;
-  --umean-surface: #1e293b;
-  --umean-surface-2: #172033;
-  --umean-text: #e2e8f0;
-  --umean-text-muted: #94a3b8;
-  --umean-heading: #f8fafc;
-  --umean-heading-2: #f1f5f9;
-  --umean-border: #334155;
-  --umean-link: #7dd3fc;
-  --umean-link-hover: #bae6fd;
-  --umean-inline-code-bg: rgba(51, 65, 85, 0.85);
-  --umean-inline-code-border: #475569;
-  --umean-inline-code-color: #e2e8f0;
-  --umean-quote-border: #818cf8;
-  --umean-quote-outline: rgba(129, 140, 248, 0.28);
-  --umean-quote-color: #cbd5e1;
-  --umean-quote-bg: rgba(129, 140, 248, 0.1);
-  --umean-quote-mark: #818cf8;
-  --umean-quote-source: #94a3b8;
-  --umean-table-border: #334155;
-  --umean-table-th-bg: #172033;
-  --umean-table-th-color: #cbd5e1;
-  --umean-table-stripe: rgba(15, 23, 42, 0.35);
-  --umean-hr: #334155;
-  --umean-highlight-bg: rgba(250, 204, 21, 0.35);
-  --umean-highlight-color: #fef9c3;
-  --umean-slash-bg: #1e293b;
-  --umean-slash-border: #334155;
-  --umean-slash-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
-  --umean-slash-item: #e2e8f0;
-  --umean-slash-hover: #334155;
-  --umean-slash-group: #64748b;
-  --umean-slash-thumb: #64748b;
-  --umean-slash-thumb-hover: #94a3b8;
-  --umean-find-bg: #854d0e;
-  --umean-find-color: #fef3c7;
-  --umean-find-current-bg: #f59e0b;
-  --umean-find-current-color: #1c1917;
-  --umean-handle: #64748b;
-  --umean-handle-hover-bg: rgba(51, 65, 85, 0.8);
-  --umean-handle-hover-color: #e2e8f0;
-  --umean-drop: #60a5fa;
-  --umean-placeholder: #94a3b8;
-  --umean-control-bg: #1e293b;
-  --umean-control-border: #475569;
-  --umean-control-hover: #334155;
-  --umean-input-bg: #0f172a;
-}
-
 :root[data-theme='light'] {
   color-scheme: light;
   --umean-bg: #f1f5f9;
@@ -112,6 +61,57 @@
   --umean-control-border: #cbd5e1;
   --umean-control-hover: #f1f5f9;
   --umean-input-bg: #ffffff;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --umean-bg: #0f172a;
+  --umean-surface: #1e293b;
+  --umean-surface-2: #172033;
+  --umean-text: #e2e8f0;
+  --umean-text-muted: #94a3b8;
+  --umean-heading: #f8fafc;
+  --umean-heading-2: #f1f5f9;
+  --umean-border: #334155;
+  --umean-link: #7dd3fc;
+  --umean-link-hover: #bae6fd;
+  --umean-inline-code-bg: rgba(51, 65, 85, 0.85);
+  --umean-inline-code-border: #475569;
+  --umean-inline-code-color: #e2e8f0;
+  --umean-quote-border: #818cf8;
+  --umean-quote-outline: rgba(129, 140, 248, 0.28);
+  --umean-quote-color: #cbd5e1;
+  --umean-quote-bg: rgba(129, 140, 248, 0.1);
+  --umean-quote-mark: #818cf8;
+  --umean-quote-source: #94a3b8;
+  --umean-table-border: #334155;
+  --umean-table-th-bg: #172033;
+  --umean-table-th-color: #cbd5e1;
+  --umean-table-stripe: rgba(15, 23, 42, 0.35);
+  --umean-hr: #334155;
+  --umean-highlight-bg: rgba(250, 204, 21, 0.35);
+  --umean-highlight-color: #fef9c3;
+  --umean-slash-bg: #1e293b;
+  --umean-slash-border: #334155;
+  --umean-slash-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  --umean-slash-item: #e2e8f0;
+  --umean-slash-hover: #334155;
+  --umean-slash-group: #64748b;
+  --umean-slash-thumb: #64748b;
+  --umean-slash-thumb-hover: #94a3b8;
+  --umean-find-bg: #854d0e;
+  --umean-find-color: #fef3c7;
+  --umean-find-current-bg: #f59e0b;
+  --umean-find-current-color: #1c1917;
+  --umean-handle: #64748b;
+  --umean-handle-hover-bg: rgba(51, 65, 85, 0.8);
+  --umean-handle-hover-color: #e2e8f0;
+  --umean-drop: #60a5fa;
+  --umean-placeholder: #94a3b8;
+  --umean-control-bg: #1e293b;
+  --umean-control-border: #475569;
+  --umean-control-hover: #334155;
+  --umean-input-bg: #0f172a;
 }
 
 .umean-editor .ProseMirror {

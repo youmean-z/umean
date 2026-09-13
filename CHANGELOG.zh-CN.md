@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.3.1
+
+### 变更
+
+- 参考主题 `rich.css` 默认亮色（`:root` / `data-theme="light"`）；暗色设 `data-theme="dark"`
+
+### 修复
+
+- `document` 标题策略：笔记标题（首行 H1）不显示拖拽手柄、不可换位；其它块也不能拖到标题前面
+
 ## 0.3.0
 
 TenTap 手机端可以写笔记：键盘上方格式栏、系统相机/相册、公式、Mermaid 预览、提示块、分割线。Web 的 Schema 与宿主 API 相对 0.2.0 没有大改。

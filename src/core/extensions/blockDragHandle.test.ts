@@ -5,6 +5,8 @@ import { NodeSelection } from '@tiptap/pm/state';
 import { createDefaultExtensions } from './defaultExtensions';
 import {
   blockDragHandlePluginKey,
+  getMinTopLevelDropPos,
+  isDocumentTitleBlockPos,
   moveTopLevelBlock,
   resolveTopLevelDropPos,
 } from './blockDragHandle';
@@ -233,6 +235,80 @@ describe('top-level-only drop', () => {
     expect(editor.view.dom.classList.contains('umean-block-dragging')).toBe(
       false,
     );
+  });
+});
+
+describe('document mode title locked', () => {
+  let editor: Editor;
+  let element: HTMLElement;
+
+  beforeEach(() => {
+    element = document.createElement('div');
+    document.body.appendChild(element);
+    editor = new Editor({
+      element,
+      extensions: createDefaultExtensions({
+        headingPolicy: { mode: 'document' },
+      }),
+      content: '<h1>Title</h1><p>hello</p><p>world</p>',
+    });
+  });
+
+  afterEach(() => {
+    editor.destroy();
+    element.remove();
+  });
+
+  it('does not render a drag handle on the document title', () => {
+    const handles = [...editor.view.dom.children].filter((el) =>
+      el.classList.contains('umean-drag-handle'),
+    );
+    expect(handles.length).toBe(2);
+
+    const title = editor.view.dom.querySelector('h1');
+    expect(title).toBeTruthy();
+    expect(
+      title?.previousElementSibling?.classList.contains('umean-drag-handle') ??
+        false,
+    ).toBe(false);
+
+    const firstParagraph = editor.view.dom.querySelector('p');
+    expect(
+      firstParagraph?.previousElementSibling?.classList.contains(
+        'umean-drag-handle',
+      ),
+    ).toBe(true);
+  });
+
+  it('rejects dragging the title block', () => {
+    const titleEnd = editor.state.doc.firstChild!.nodeSize;
+    expect(getMinTopLevelDropPos(editor.state.doc, 'document')).toBe(titleEnd);
+    expect(isDocumentTitleBlockPos(editor.state.doc, 0, 'document')).toBe(true);
+    expect(moveTopLevelBlock(editor.view, 0, titleEnd + 1, 'document')).toBe(
+      false,
+    );
+    expect(editor.state.doc.firstChild?.textContent).toBe('Title');
+  });
+
+  it('clamps drops so blocks cannot move above the title', () => {
+    let worldStart = 0;
+    editor.state.doc.forEach((node, offset) => {
+      if (node.type.name === 'paragraph' && node.textContent === 'world') {
+        worldStart = offset;
+      }
+    });
+    const titleEnd = editor.state.doc.firstChild!.nodeSize;
+
+    const moved = moveTopLevelBlock(editor.view, worldStart, 0, 'document');
+    expect(moved).toBe(true);
+
+    const topTexts: string[] = [];
+    editor.state.doc.forEach((node) => {
+      topTexts.push(node.textContent);
+    });
+    expect(topTexts[0]).toBe('Title');
+    expect(topTexts.slice(1)).toEqual(['world', 'hello']);
+    expect(editor.state.doc.resolve(titleEnd).depth).toBe(0);
   });
 });
 

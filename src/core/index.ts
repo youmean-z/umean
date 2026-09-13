@@ -9,6 +9,8 @@ export { HeadingPolicy } from './extensions/headingPolicy';
 export {
   BlockDragHandle,
   blockDragHandlePluginKey,
+  getMinTopLevelDropPos,
+  isDocumentTitleBlockPos,
   moveTopLevelBlock,
   resolveTopLevelDropPos,
   type BlockDragHandleOptions,

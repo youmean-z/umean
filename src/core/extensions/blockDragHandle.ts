@@ -3,9 +3,35 @@ import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { NodeSelection, Plugin, PluginKey, type Transaction } from '@tiptap/pm/state';
 import { Decoration, DecorationSet, type EditorView } from '@tiptap/pm/view';
 
+import type { HeadingPolicyMode } from '../types';
+import { getEditorHeadingPolicyMode } from '../utils/headingPolicyUtils';
+
 export interface BlockDragHandleOptions {
   /** 是否显示左侧手柄，默认 true */
   showHandle?: boolean;
+}
+
+/**
+ * `document` 模式下标题固定在首块，其它块的落点不能早于标题结束位置。
+ * 非 document 或空文档返回 0。
+ */
+export function getMinTopLevelDropPos(
+  doc: ProseMirrorNode,
+  mode: HeadingPolicyMode,
+): number {
+  if (mode !== 'document' || !doc.firstChild) {
+    return 0;
+  }
+  return doc.firstChild.nodeSize;
+}
+
+/** `document` 下首块是策略托管的标题，不可拖。 */
+export function isDocumentTitleBlockPos(
+  doc: ProseMirrorNode,
+  blockPos: number,
+  mode: HeadingPolicyMode,
+): boolean {
+  return mode === 'document' && blockPos === 0 && doc.firstChild != null;
 }
 
 export interface BlockDragHandlePluginState {
@@ -99,6 +125,7 @@ export function moveTopLevelBlock(
   view: EditorView,
   fromPos: number,
   toPos: number,
+  mode: HeadingPolicyMode = 'free',
 ): boolean {
   const { doc } = view.state;
   const node = doc.nodeAt(fromPos);
@@ -106,29 +133,36 @@ export function moveTopLevelBlock(
     return false;
   }
 
+  if (isDocumentTitleBlockPos(doc, fromPos, mode)) {
+    return false;
+  }
+
+  const minDrop = getMinTopLevelDropPos(doc, mode);
+  const clampedTo = Math.max(toPos, minDrop);
+
   const fromEnd = fromPos + node.nodeSize;
-  if (toPos === fromPos || toPos === fromEnd) {
+  if (clampedTo === fromPos || clampedTo === fromEnd) {
     return false;
   }
 
   // 目标必须是顶层间隙
-  if (toPos < 0 || toPos > doc.content.size) {
+  if (clampedTo < 0 || clampedTo > doc.content.size) {
     return false;
   }
-  if (doc.resolve(toPos).depth !== 0) {
+  if (doc.resolve(clampedTo).depth !== 0) {
     return false;
   }
 
   let tr: Transaction;
-  if (toPos > fromPos) {
+  if (clampedTo > fromPos) {
     tr = view.state.tr.delete(fromPos, fromEnd);
-    const insertAt = toPos - node.nodeSize;
+    const insertAt = clampedTo - node.nodeSize;
     tr = tr.insert(insertAt, node);
     tr = tr.setSelection(NodeSelection.create(tr.doc, insertAt));
   } else {
     tr = view.state.tr.delete(fromPos, fromEnd);
-    tr = tr.insert(toPos, node);
-    tr = tr.setSelection(NodeSelection.create(tr.doc, toPos));
+    tr = tr.insert(clampedTo, node);
+    tr = tr.setSelection(NodeSelection.create(tr.doc, clampedTo));
   }
 
   tr = tr.setMeta(blockDragHandlePluginKey, { draggingFrom: null } satisfies DragHandleMeta);
@@ -178,6 +212,7 @@ function startBlockDrag(
 function createDragHandle(
   view: EditorView,
   getPos: (() => number | undefined) | boolean,
+  mode: HeadingPolicyMode,
 ): HTMLElement {
   const handle = document.createElement('button');
   handle.type = 'button';
@@ -204,6 +239,11 @@ function createDragHandle(
       return;
     }
 
+    if (isDocumentTitleBlockPos(view.state.doc, blockPos, mode)) {
+      event.preventDefault();
+      return;
+    }
+
     startBlockDrag(view, event, blockPos);
   });
 
@@ -218,18 +258,26 @@ function createDragHandle(
   return handle;
 }
 
-function buildHandleDecorations(doc: ProseMirrorNode): DecorationSet {
+function buildHandleDecorations(
+  doc: ProseMirrorNode,
+  mode: HeadingPolicyMode,
+): DecorationSet {
   const decorations: Decoration[] = [];
 
-  doc.forEach((node, offset) => {
+  doc.forEach((node, offset, index) => {
     if (node.nodeSize < 1) {
+      return;
+    }
+
+    // document：首块标题不挂手柄
+    if (mode === 'document' && index === 0) {
       return;
     }
 
     decorations.push(
       Decoration.widget(
         offset,
-        (view, getPos) => createDragHandle(view, getPos),
+        (view, getPos) => createDragHandle(view, getPos, mode),
         {
           // side >= 0：挂在该位置之后的节点上，作为块前的兄弟节点
           // （side < 0 会挂到前一个节点末尾，atom/NodeView 上会丢）
@@ -249,6 +297,7 @@ function buildHandleDecorations(doc: ProseMirrorNode): DecorationSet {
  */
 class BlockDropIndicatorView {
   private readonly view: EditorView;
+  private readonly getMode: () => HeadingPolicyMode;
   private element: HTMLElement | null = null;
   private dropPos: number | null = null;
   private active = false;
@@ -257,8 +306,9 @@ class BlockDropIndicatorView {
   private readonly onDragEnd: () => void;
   private readonly onDrop: () => void;
 
-  constructor(view: EditorView) {
+  constructor(view: EditorView, getMode: () => HeadingPolicyMode) {
     this.view = view;
+    this.getMode = getMode;
     this.onDragOver = (event) => this.handleDragOver(event);
     this.onDragLeave = (event) => this.handleDragLeave(event);
     this.onDragEnd = () => this.clearIndicator();
@@ -315,10 +365,10 @@ class BlockDropIndicatorView {
       return;
     }
 
-    const toPos = resolveTopLevelDropPos(
-      this.view,
-      coords.pos,
-      event.clientY,
+    const mode = this.getMode();
+    const toPos = Math.max(
+      resolveTopLevelDropPos(this.view, coords.pos, event.clientY),
+      getMinTopLevelDropPos(this.view.state.doc, mode),
     );
     this.dropPos = toPos;
     this.updateOverlay(toPos);
@@ -433,6 +483,8 @@ export const BlockDragHandle = Extension.create<BlockDragHandleOptions>({
       return [];
     }
 
+    const editor = this.editor;
+
     return [
       new Plugin<BlockDragHandlePluginState>({
         key: blockDragHandlePluginKey,
@@ -457,11 +509,16 @@ export const BlockDragHandle = Extension.create<BlockDragHandleOptions>({
           },
         },
         view(editorView) {
-          return new BlockDropIndicatorView(editorView);
+          return new BlockDropIndicatorView(editorView, () =>
+            getEditorHeadingPolicyMode(editor),
+          );
         },
         props: {
           decorations(state) {
-            return buildHandleDecorations(state.doc);
+            return buildHandleDecorations(
+              state.doc,
+              getEditorHeadingPolicyMode(editor),
+            );
           },
           handleDrop(view, event, _slice, _moved) {
             const pluginState = blockDragHandlePluginKey.getState(view.state);
@@ -469,6 +526,7 @@ export const BlockDragHandle = Extension.create<BlockDragHandleOptions>({
               return false;
             }
 
+            const mode = getEditorHeadingPolicyMode(editor);
             const fromPos = pluginState.draggingFrom;
             const coords = view.posAtCoords({
               left: event.clientX,
@@ -479,12 +537,11 @@ export const BlockDragHandle = Extension.create<BlockDragHandleOptions>({
               return true;
             }
 
-            const toPos = resolveTopLevelDropPos(
-              view,
-              coords.pos,
-              event.clientY,
+            const toPos = Math.max(
+              resolveTopLevelDropPos(view, coords.pos, event.clientY),
+              getMinTopLevelDropPos(view.state.doc, mode),
             );
-            moveTopLevelBlock(view, fromPos, toPos);
+            moveTopLevelBlock(view, fromPos, toPos, mode);
             // 若未移动也要清状态
             if (blockDragHandlePluginKey.getState(view.state)?.draggingFrom != null) {
               setDraggingFrom(view, null);

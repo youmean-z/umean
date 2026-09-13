@@ -38,10 +38,10 @@ const core = createEditor({
 
 ## 主题
 
-在 `<html>` 上设 `data-theme="light"` 或 `"dark"`（默认暗色）。Slash 菜单 portal 到 `body`，不要只改编辑器容器。
+在 `<html>` 上设 `data-theme="light"` 或 `"dark"`（默认亮色；不设 `data-theme` 也是亮色）。Slash 菜单 portal 到 `body`，不要只改编辑器容器。
 
 ```ts
-document.documentElement.dataset.theme = 'light';
+document.documentElement.dataset.theme = 'dark';
 ```
 
 | 跟着主题 | 始终暗色 |
@@ -115,7 +115,7 @@ Obsidian 风格，Slash 搜「提示」「警告」：
 ## 交互
 
 - **Slash**：空行 `/`。`document` / `chunk` 标题策略下不出现一级标题。
-- **块拖拽**：仅顶层兄弟换位，不会拖进引用或 Callout。
+- **块拖拽**：仅顶层兄弟换位，不会拖进引用或 Callout。`document` 模式下笔记标题（首行 H1）不显示手柄、不可拖，其它块也不能拖到标题前面。
 - **只读**：`core.setEditable(false)`，隐藏光标、placeholder、手柄（布局不跳）。
 - **查找替换**：核心只有命令和高亮，**没有面板**。宿主自己做输入条，例如：
 

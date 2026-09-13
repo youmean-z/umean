@@ -173,7 +173,7 @@ const shortcutPanelEl = document.querySelector(
 const THEME_KEY = 'umean-theme';
 
 function currentTheme(): 'light' | 'dark' {
-  return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+  return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
 }
 
 function syncThemeButton(): void {

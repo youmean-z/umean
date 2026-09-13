@@ -9,11 +9,11 @@
         try {
           var t = localStorage.getItem('umean-theme');
           if (t !== 'light' && t !== 'dark') {
-            t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+            t = 'light';
           }
           document.documentElement.dataset.theme = t;
         } catch (e) {
-          document.documentElement.dataset.theme = 'dark';
+          document.documentElement.dataset.theme = 'light';
         }
       })();
     </script>
@@ -276,7 +276,7 @@
           <button type="button" id="btn-insert-template">插入模板</button>
           <label><input id="toggle-readonly" type="checkbox" /> 只读预览</label>
           <button type="button" id="btn-toggle-shortcuts">快捷键表</button>
-          <button type="button" id="btn-toggle-theme">亮色</button>
+          <button type="button" id="btn-toggle-theme">暗色</button>
           <span class="stats" id="word-stats">字数 —</span>
         </div>
         <pre class="shortcut-panel" id="shortcut-panel" hidden></pre>

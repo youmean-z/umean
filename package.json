@@ -1,6 +1,6 @@
 {
   "name": "umean",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "TipTap WYSIWYG editor core — Web, Electron & TenTap",
   "type": "module",
   "main": "./dist/index.js",
